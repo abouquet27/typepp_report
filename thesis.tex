@@ -41,10 +41,11 @@ each: what area you are in, the problem you focus on, why existing work is
 insufficient, what the high-level intuition of your work is, maybe a neat
 design or implementation decision, and key results of your evaluation.
 
-My project: Explain Type confusion, the Hextype solution, the Typepp solution, aim of the paper and explain the results
-+\nb{the goal of this project is benchmark for type confusion. You should argue
-+tc are a problem. we want to compare tools. no need to introduce the different
-+techniques here}
+My project: 
+Explain Type confusion, and why they are a problem i.e memory attacks, safety, more control over types
+compare two solutions to type confusion.
+aim of the paper i.e., creating a general benchmark for type confusion and explain the results
+
 
 \end{abstract}
 
@@ -67,7 +68,7 @@ The eights paragraph discusses your core contribution.
 My project: 
 1. Explain Type confusion, Hextype solution and Typepp solution
 2. Measure Typepp solution by assessing tests and compare it to Hextype
-3. Explain the aim of the benchmark and how he achieves it
+3. Explain the aim of the paper, i.e. general benchmark for type confusion and how he achieves it
 
 %%%%%%%%%%%%%%%%%%%%
 \chapter{Background}
@@ -124,14 +125,14 @@ experiments showcase the individual points you want to prove.
 This section is usually 5-10 pages.
 
 Evalutates the test suite, explain the results
-Stats that could be useful:
+Stats that could be useful for a single sanitizers:
+- Correctness: Number of type confusion detected and classified as type confusion by the sanitizer while they were
+- False positive: Number of type confusion detected and classified as type confusion by the sanitizer while they weren't ones
+- False negative: Number of type confusion missed by the sanitizer i.e., classified as not type confusion but they were
+
 - type confusion detected and well classified by both
 - type confusion missed by one of the two
 - type confusion missed by both
-
-Which one is more accurate ? 
-
-Create Benchmark to measure time ??
 
 Give intuition on how to improve the current solutions
 
@@ -150,6 +151,8 @@ This section is usually 3-5 pages.
 
 Discuss other sanitizers, other solutions to type confusion,
 which may implements other solutions or same solutions but differently.
+
+If time allows, test other sanitizer
 
 
 
