@@ -21,6 +21,12 @@
 \expert{The External Reviewer}
 
 \newcommand{\sysname}{FooSystem\xspace}
++\newcommand{\todobox}[3]{%
++       \colorbox{#1}{\textcolor{white}{\sffamily\bfseries\scriptsize #2}}%
++       ~\textcolor{#1}{#3} %
++       \textcolor{#1}{$\triangleleft$}%
++}
++\newcommand{\nb}[1]{\todobox{violet}{NB}{#1}}
 
 \begin{document}
 \maketitle
@@ -36,6 +42,10 @@ insufficient, what the high-level intuition of your work is, maybe a neat
 design or implementation decision, and key results of your evaluation.
 
 My project: Explain Type confusion, the Hextype solution, the Typepp solution, aim of the paper and explain the results
++\nb{the goal of this project is benchmark for type confusion. You should argue
++tc are a problem. we want to compare tools. no need to introduce the different
++techniques here}
+
 \end{abstract}
 
 \maketoc
@@ -57,7 +67,7 @@ The eights paragraph discusses your core contribution.
 My project: 
 1. Explain Type confusion, Hextype solution and Typepp solution
 2. Measure Typepp solution by assessing tests and compare it to Hextype
-3. 
+3. Explain the aim of the benchmark and how he achieves it
 
 %%%%%%%%%%%%%%%%%%%%
 \chapter{Background}
@@ -85,7 +95,8 @@ This section is usually 5-10 pages.
 
 My project:
 1. Explain test suite on initialization 
-2. Examples of test cases, 
+2. Explain why it is a good benchmark to measure the efficiency of the solution
+3. Example of test cases
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%
