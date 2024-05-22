@@ -27,6 +27,7 @@
 +       \textcolor{#1}{$\triangleleft$}%
 +}
 +\newcommand{\nb}[1]{\todobox{violet}{NB}{#1}}
++\newcommand{\adrbqt}[1]{\todobox{red}{TODO}{#1}}
 
 \begin{document}
 \maketitle
@@ -89,10 +90,27 @@ or Machine Learning. While keeping the base of systems programming language C, C
 implementing new features, one of them being Object-Oriented Programming (OOP). In the following, we will introduce the key 
 concept of OOP, and how it is implemented in C++. 
 
-\subsection{Object-Oriented Programming, Class Hierarchies and Polymorphism}
-Object-Oriented Programming is about creating objects which are instances of classes that contain both data and functions. 
-Theses classes are organized in hierarchies, and can inherit attributes and methods from other classes.  
+\subsection{Object-Oriented Programming, Class Hierarchies and Inheritance}
+\adrbqt{Is talking more about Polymporphism worth it?}
+Object-Oriented Programming is about creating objects which are instances of classes that contain both data and functions. This paradigm provides
+data abstraction, faster execution and code reusability. 
 
+\adrbqt{Add an example of base-child relationship, Maybe it's better do to an example with a type confusion within}.
+
+Classes are organized in hierarchies, generally with one base class and one derived class, and can inherit attributes and methods from other classes which they
+they can use or override. A derived class can have multiple base classes and thus possesses all the methods and attributes from its base classes. 
+Furthermore, a derived class is a subtype of its base class, meaning that a derived class can be used in place of its base class. This concept which is called 
+Polymporphism, is remarkably practical but leads to some issues. For instance, when a base class has two derived classes that are not directly related to each other, 
+it is possible to cast a pointer from one derived class to another in type casting by the base class. \adrbqt{Add an example of type casting}
+This is called type confusion and can lead to memory corruption and security vulnerabilities.
+
+\adrbqt{}
+\subsection{Type Casting}
+Typecasting is the operation of casting a pointer from a type to another. In C++, 
+
+With Inheritance, it is always safe to cast from a derived class to a base class, 
+as the base is a subset of the derived class. Since However, the converse is not always true, since a base class does not cover necessarily its derived classes, 
+and can lead to type confusion. 
 
 %%%%%%%%%%%%%%%%
 \chapter{Design}
