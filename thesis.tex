@@ -101,16 +101,37 @@ Classes are organized in hierarchies, generally with one base class and one deri
 they can use or override. A derived class can have multiple base classes and thus possesses all the methods and attributes from its base classes. 
 Furthermore, a derived class is a subtype of its base class, meaning that a derived class can be used in place of its base class. This concept which is called 
 Polymporphism, is remarkably practical but leads to some issues. For instance, when a base class has two derived classes that are not directly related to each other, 
-it is possible to cast a pointer from one derived class to another in type casting by the base class. \adrbqt{Add an example of type casting}
+it is possible to cast a pointer from one derived class to another in type casting by the base class.
 This is called type confusion and can lead to memory corruption and security vulnerabilities.
 
 \adrbqt{}
 \subsection{Type Casting}
-Typecasting is the operation of casting a pointer from a type to another. In C++, 
+Typecasting is the operation of casting a pointer from a type to another. C++ provides four casting operators: static\_cast, dynamic\_cast, 
+const\_cast and reinterpret\_cast.
+\adrbqt{Add an example of type casting}
 
-With Inheritance, it is always safe to cast from a derived class to a base class, 
-as the base is a subset of the derived class. Since However, the converse is not always true, since a base class does not cover necessarily its derived classes, 
-and can lead to type confusion. 
+\texttt{\textbf{const\_cast}<target-type>(expression)} revokes the constness or volatileness of an object. Due to the operator's behaviour, it does not impact type hierarchies and 
+thus does not lead to type confusion. Nevertheless, there are some issues with const\_cast, which won't be discussed in this paper, since not relevant to the subject.
+
+\texttt{\textbf{static\_cast}<target-type>(expression)} cast an expression to a specified type and checks only compile-time without any runtime check. Therefore, this reduces cast verification to checking the types 
+in the type hierarchy. It does not guarantee the types are compatible at runtime and places the onus back on programmers to ensure type correctness. Hence, it leads to a type confusion vulnerability when misused i.e.,
+casting from the base class to a derived class or when casting a pointer to a void pointer.
+
+\texttt{\textbf{reinterpret\_cast}<target-type>(expression)} similarly to static\_cast, it casts an expression to a specified type by reinterpreting the underlying bit pattern but with the difference 
+that it does not check neither at compile time nor at runtime. Hence, it can potentially cast two incompatible types and lead to type confusion. 
+It is also the programmer's responsibility to ensure the correctness of the target-type and the type of expression.
+
+\texttt{\textbf{dynamic\_cast}<target-type>(expression)} cast safely an expression to a specified type and checks at compile-time and at runtime, unlike \texttt{static_cast}, if the types are compatible. 
+To achieve the runtime check, \texttt{dynamic\_cast} must leverage heavy-weight metadata, Run Time Type Information (RTTI). However, RTTI is only available when the class has at least one virtual function 
+and thus is polymorphic, which constraint to use \texttt{dynamic\_cast} only on polymorphic classes. In addition, security checks at runtime are more expensive than only compile-time checks because of their 
+nature and can lead to performance issues by introducing overhead.
+
+Finally, C-style typecasting exists in C++ due to backward compatibility between both languages but highly discouraged due for instance to its lack of clarity for programmers. 
+Furthermore, the compiler translate C-style typecasting to (i) \texttt{const\_cast}, (ii) \texttt{static\_cast} and (iii) \texttt{reinterpret\_cast} in this preferred order which passes on the underlying types confusions.
+
+\adrbqt{check ISO/IEC 14882:2020 https://www.iso.org/standard/79358.html}
+
+\subsection{Type confusion, Hextype and Typepp solutions}
 
 %%%%%%%%%%%%%%%%
 \chapter{Design}
