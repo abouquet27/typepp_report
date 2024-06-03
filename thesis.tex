@@ -145,15 +145,15 @@ As previously mentioned, type confusion vulnerabilities can lead to some memory 
 2021-31317) or Google Chromium (CVE-2021-30627,CVE-2022-1096, CVE-2022-1134, CVE-2022-2295) are exposed to. Hence, it is a problem that require to be handled for developer and user safety.
 There are many solutions with different paradigm to address type confusion . In this paper, we will focus on two solutions: Hextype and Typepp.
 Both solution are similar in the sense that they verify at runtime each cast to prevent type confusion. However, they differ in their implementation and how they handle type confusion.
-According to previous work, there exist two mechanisms to detect type confusion: (i) relying on disjoint metadata, such as type table or trees, and 
-(ii) relying on existing metadata, such as vtables. In our case, Hextype is based on the former and Typepp on the latter. 
+According to previous work, there exist two mechanisms to detect type confusion: (i) relying on disjoint metadata, such as type table to keep track of each type of each object or trees for type hierarchy, and 
+(ii) relying on existing metadata, such as Runtime Type Information (RTTI) and vtables. \adrbqt{Taken from the Hextype document but is there more than two ways ?}
 
 \adrbqt{Do I have to discuss the advantage and drawbacks of each type solution?}
 
 \adrbqt{Discuss other solutions with Nicolas}
 \subsubsection{Hextype}
 
-HexType is a Clang/LLVM-based type confusion sanitizer used to detect type confusion vulnerabilities in C++ programs. As previously mentioned, it relies on disjoint metadata to achieve type safety 
+HexType is a Clang/LLVM-based type confusion sanitizer used to detect type confusion vulnerabilities in C++ programs. It relies on disjoint metadata to achieve type safety 
 
 \subsection{Typepp}
 
