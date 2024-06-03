@@ -153,9 +153,26 @@ According to previous work, there exist two mechanisms to detect type confusion:
 \adrbqt{Discuss other solutions with Nicolas}
 \subsubsection{Hextype}
 
+What I want to talk about Hextype?
+\begin{itemize}
+       \item What is Hextype?
+       \item Why is it relevant?
+       \item How does it work?
+\end{itemize}
+
 HexType is a Clang/LLVM-based type confusion sanitizer used to detect type confusion vulnerabilities in C++ programs. It relies on disjoint metadata to achieve type safety 
 
 \subsection{Typepp}
+
+What I want to talk about Typepp?
+\begin{itemize}
+       \item What is Typepp?
+       \item How does it work?
+       \item Why is it relevant?
+
+\end{itemize}
+
+Why comparing Hextype and Typepp?
 
 %%%%%%%%%%%%%%%%
 \chapter{Design}
@@ -172,7 +189,13 @@ My project:
 2. Explain why it is a good benchmark to measure the efficiency of the solution
 3. Example of test cases
 
+\begin{itemize}
+       \item Why testing initialization? How is it relevant?
+       \item Why is it a good benchmark? How to measure the efficiency of the solution?
+       \item Constraint and limit of the test suite
+       \item Example of test cases
 
+\end{itemize}
 %%%%%%%%%%%%%%%%%%%%%%%%
 \chapter{Implementation}
 %%%%%%%%%%%%%%%%%%%%%%%%
@@ -185,6 +208,12 @@ This section is usually 3-5 pages.
 
 How are we going to implement the test suite according to what was previously defined? What are the challenges? 
 How are we going to measure the results?
+
+\begin{itemize}
+       \item How are we going to implement the test suite according to what was previously defined? 
+       \item What were the challenges?
+       \item How are we going to measure the results?
+\end{itemize}
 
 
 %%%%%%%%%%%%%%%%%%%%
@@ -199,13 +228,15 @@ This section is usually 5-10 pages.
 
 Evalutates the test suite, explain the results
 Stats that could be useful for a single sanitizers:
-- Correctness: Number of type confusion detected and classified as type confusion by the sanitizer while they were
-- False positive: Number of type confusion detected and classified as type confusion by the sanitizer while they weren't ones
-- False negative: Number of type confusion missed by the sanitizer i.e., classified as not type confusion but they were
+\begin{itemize}
+       \item Correctness: Number of type confusion detected and classified as type confusion by the sanitizer while they were
+       \item False positive: Number of type confusion detected and classified as type confusion by the sanitizer while they weren't ones
+       \item False negative: Number of type confusion missed by the sanitizer i.e., classified as not type confusion but they were
 
-- type confusion detected and well classified by both
-- type confusion missed by one of the two
-- type confusion missed by both
+       \item type confusion detected and well classified by both
+       \item type confusion missed by one of the two
+       \item type confusion missed by both
+\end{itemize}
 
 Give intuition on how to improve the current solutions
 
