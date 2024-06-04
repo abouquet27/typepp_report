@@ -68,8 +68,8 @@ The seventh paragraph will highlight some of your results
 The eights paragraph discusses your core contribution.
 
 My project: 
-1. Explain Type confusion, Hextype solution and Typepp solution
-2. Measure Typepp solution by assessing tests and compare it to Hextype
+1. Explain Type confusion, Hextype solution and type++ solution
+2. Measure type++ solution by assessing tests and compare it to Hextype
 3. Explain the aim of the paper, i.e. general benchmark for type confusion and how he achieves it
 
 %%%%%%%%%%%%%%%%%%%%
@@ -85,7 +85,7 @@ This section is usually 3-5 pages.
 My project:
 0. Introduce C++, Type confusion
 1. Explain in more detail and with examples, C++ inheritance and casting
-2. Hextype and Typepp paradigm and how they handle type confusion
+2. Hextype and type++ paradigm and how they handle type confusion
 
 \subsection{C++ and Type Confusion}
 
@@ -100,7 +100,6 @@ when casting a pointer from a base class to a derived class. In the following, w
 We will then introduce the different type casting operators in C++ and how they can be used to cast a pointer from a type to another. Finally, we will present the different solutions to type confusion and how they handle it.
 
 \subsection{Object-Oriented Programming, Class Hierarchies and Inheritance}
-\adrbqt{Is talking more about Polymporphism worth it?}\nb{yes}
 Object-Oriented Programming (OOP) is about creating objects which are instances of classes that contain both data and functions. This paradigm provides
 data abstraction, faster execution and code reusability. 
 
@@ -111,8 +110,7 @@ they can use or override. \nb{add mention of where you find this in your example
 Furthermore, a derived class is a subtype of its base class, meaning that a derived class can be used in place of its base class. This concept which is called 
 Polymporphism, is remarkably practical but leads to some issues. For instance, when a base class has two derived classes that are not directly related to each other, 
 it is possible to cast a pointer from one derived class to another in type casting by the base class.
-This is called type confusion and can lead to memory corruption and security vulnerabilities. \nb{tc are much broader. I would introduce them before OOP}
-
+This is called type confusion and can lead to memory corruption and security vulnerabilities.
 \adrbqt{}
 \subsection{Type Casting}
 Typecasting is the operation of casting a pointer from a type to another. C++ provides four casting operators: \texttt{static\_cast}, \texttt{dynamic\_cast}, 
@@ -139,40 +137,42 @@ Furthermore, the compiler translate C-style typecasting to (i) \texttt{const\_ca
 
 \adrbqt{check ISO/IEC 14882:2020 https://www.iso.org/standard/79358.html}
 
-\subsection{Solutions, Hextype and Typepp}
+\subsection{Solutions, Hextype and type++}
 
 As previously mentioned, type confusion vulnerabilities can lead to some memory corruption and security vulnerabilities which products such as Telegram (CVE-2021-31318, CVE-
-2021-31317) or Google Chromium (CVE-2021-30627,CVE-2022-1096, CVE-2022-1134, CVE-2022-2295) are exposed to. Hence, it is a problem that require to be handled for developer and user safety.
-There are many solutions with different paradigm to address type confusion . In this paper, we will focus on two solutions: Hextype and Typepp.
-Both solution are similar in the sense that they verify at runtime each cast to prevent type confusion. However, they differ in their implementation and how they handle type confusion.
-According to previous work, there exist two mechanisms to detect type confusion: (i) relying on disjoint metadata, such as type table to keep track of each type of each object or trees for type hierarchy, and 
-(ii) relying on existing metadata, such as Runtime Type Information (RTTI) and vtables. \adrbqt{Taken from the Hextype document but is there more than two ways ?}
+2021-31317) or Google Chromium (CVE-2021-30627,CVE-2022-1096, CVE-2022-1134, CVE-2022-2295) are exposed to. Hence, it is a problem that require to be handled for developer and user safety. 
+The compiler checks statically the correctness of each cast to ensure that the types are compatible but it does not guarantee the same correctness at runtime, 
+because for instance an object of a derived class can be used in place of an object of a base class due to Polymporphism and vice versa. \adrbqt{Add in the same example} 
+To detect type confusion at runtime, there exists two approaches: (i) relying on disjoint metadata, such as type table to keep track of each type of each object or trees for type hierarchy, and 
+(ii) relying on existing metadata, such as Runtime Type Information (RTTI) and vtables. 
+Generally, the first approach is more efficient because it covers more types but it introduces overhead and performance issues. The second is faster but less efficient due to its limitation to polymorphic classes and it caused some crash issue. 
+In this paper, we will focus and compare on two solutions: Hextype and type++. 
+Both solutions checks types correctness at runtime but they differ in their approach.Comparing them offers a perspective on the effectiveness of each approach, despite the age difference between the development of these two solutions.
+Hextype is older and relies on disjoint metadata to achieve types correctness. 
+Type++ is a recent solution and relies on existing metadata to achieve types correctness but unlike an approach based solely on existing metadata for Polymporphism object,
+it extends this by adding a vtable pointer to each object to enforce efficiency, cover more types and avoid crash issue. In the following, we will detail how Hextype and type++ work.
 
-\adrbqt{Do I have to discuss the advantage and drawbacks of each type solution?}
-
-\adrbqt{Discuss other solutions with Nicolas}
 \subsubsection{Hextype}
 
 What I want to talk about Hextype?
 \begin{itemize}
        \item What is Hextype?
-       \item Why is it relevant?
        \item How does it work?
+       \item Its limitations
 \end{itemize}
 
 HexType is a Clang/LLVM-based type confusion sanitizer used to detect type confusion vulnerabilities in C++ programs. It relies on disjoint metadata to achieve type safety 
 
-\subsection{Typepp}
+\subsection{type++}
 
-What I want to talk about Typepp?
+What I want to talk about type++?
 \begin{itemize}
-       \item What is Typepp?
+       \item What is type++?
        \item How does it work?
-       \item Why is it relevant?
-
+       \item Its limitations
 \end{itemize}
 
-Why comparing Hextype and Typepp?
+
 
 %%%%%%%%%%%%%%%%
 \chapter{Design}
