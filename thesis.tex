@@ -187,21 +187,26 @@ This section is usually 5-10 pages.
 \adrbqt{Is adding a paragraph on particular case such as phantom cast, multiple inheritance, placement new or allocation a good idea ?}
 
 \begin{itemize}
-       \item Threat model and aime of the suite 
+       \item Threat model and aim of the suite 
        \item Why testing initialization? How is it relevant?
        \item Why is it a good benchmark? How to measure the efficiency of the solution?
-       \item Constraint and limit of the test suite
-       \item Example of test cases
 
 \end{itemize}
 
 \section{Benchmarking Type Confusion}
 
 Our threat model assumes that an adversary can exploit type confusion vulnerabilities to execute arbitrary code. 
-To evaluate how a sanitizer can detect types of confusion and, a fortiori, prevent such adversaries from exploiting these vulnerabilities, we build a test suite of type confusions. 
-The goal of the benchmark is to test 
+We built a test suite with a multitude of cases to evaluate how a sanitizer can detect these types confusion and, 
+a fortiori, try to prevent such adversaries from exploiting these vulnerabilities,
+We particularly focus on the initialization of objects and pointers, because it is at initialization step that 
+both methods operate, one by adding a vtable pointer to every object and the other by recording all necessary 
+information in its disjoint metadata. Then, we try to create various special test cases to trigger 
+type confusion vulnerabilities that can occur in C++ programs. 
 
-
+We want to compare the results of Hextype and type++, individually and between them. The benchmark quality resides 
+in the diversity and coverage offered by most of the tests. In the following we will concentrate on C++11,
+although there are more recent versions with more features dedicated to OOP. In addition, we mainly test the standard
+C++11 without any external libraries or frameworks. 
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%
@@ -221,6 +226,7 @@ How are we going to measure the results?
        \item How are we going to implement the test suite according to what was previously defined? 
        \item What were the challenges?
        \item How are we going to measure the results?
+       \item Example of test cases
 \end{itemize}
 
 
@@ -244,6 +250,9 @@ Stats that could be useful for a single sanitizers:
        \item type confusion detected and well classified by both
        \item type confusion missed by one of the two
        \item type confusion missed by both
+
+       \item Constraint and limit of the test suite
+
 \end{itemize}
 
 Give intuition on how to improve the current solutions
