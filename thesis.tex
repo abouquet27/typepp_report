@@ -87,7 +87,7 @@ My project:
 1. Explain in more detail and with examples, C++ inheritance and casting
 2. Hextype and type++ paradigm and how they handle type confusion
 
-\subsection{C++ and Type Confusion}
+\section{C++ and Type Confusion}
 
 C++ is a general purpose programming language widely-used in a lot of domain such as operating systems, 
 or machine learning. Types are a core concept in C++ but are source of vulnerabilities. For instance, type confusion 
@@ -99,7 +99,7 @@ Theses wrong casts can occur when casting a pointer outside of the type hierarch
 when casting a pointer from a base class to a derived class. In the following, we will explain the object-oriented programming, class hierarchies and inheritance in C++ and how it can lead to type confusion. 
 We will then introduce the different type casting operators in C++ and how they can be used to cast a pointer from a type to another. Finally, we will present the different solutions to type confusion and how they handle it.
 
-\subsection{Object-Oriented Programming, Class Hierarchies and Inheritance}
+\section{Object-Oriented Programming, Class Hierarchies and Inheritance}
 Object-Oriented Programming (OOP) is about creating objects which are instances of classes that contain both data and functions. This paradigm provides
 data abstraction, faster execution and code reusability. 
 
@@ -111,8 +111,8 @@ Furthermore, a derived class is a subtype of its base class, meaning that a deri
 Polymporphism, is remarkably practical but leads to some issues. For instance, when a base class has two derived classes that are not directly related to each other, 
 it is possible to cast a pointer from one derived class to another in type casting by the base class.
 This is called type confusion and can lead to memory corruption and security vulnerabilities.
-\adrbqt{}
-\subsection{Type Casting}
+
+\section{Type Casting}
 Typecasting is the operation of casting a pointer from a type to another. C++ provides four casting operators: \texttt{static\_cast}, \texttt{dynamic\_cast}, 
 \texttt{const\_cast} and \texttt{reinterpret\_cast}
 \adrbqt{Add an example of type casting}
@@ -137,7 +137,7 @@ Furthermore, the compiler translate C-style typecasting to (i) \texttt{const\_ca
 
 \adrbqt{check ISO/IEC 14882:2020 https://www.iso.org/standard/79358.html}
 
-\subsection{Solutions, Hextype and type++}
+\section{Solutions, Hextype and type++}
 
 As previously mentioned, type confusion vulnerabilities can lead to some memory corruption and security vulnerabilities which products such as Telegram (CVE-2021-31318, CVE-
 2021-31317) or Google Chromium (CVE-2021-30627,CVE-2022-1096, CVE-2022-1134, CVE-2022-2295) are exposed to. Hence, it is a problem that require to be handled for developer and user safety. 
@@ -147,21 +147,22 @@ To detect type confusion at runtime, there exists two approaches: (i) relying on
 (ii) relying on existing metadata, such as Runtime Type Information (RTTI) and vtables. 
 Generally, the first approach is more efficient because it covers more types but it introduces overhead and performance issues. The second is faster but less efficient due to its limitation to polymorphic classes and it caused some crash issue. 
 In this paper, we will focus and compare on two solutions: Hextype and type++. 
-Both solutions checks types correctness at runtime but they differ in their approach.Comparing them offers a perspective on the effectiveness of each approach, despite the age difference between the development of these two solutions.
+Both solutions checks types correctness at runtime but they differ in their approach. Comparing them offers a perspective on the effectiveness of each approach, despite the age difference between the development of these two solutions.
 Hextype is older and relies on disjoint metadata to achieve types correctness. 
 Type++ is a recent solution and relies on existing metadata to achieve types correctness but unlike an approach based solely on existing metadata for Polymporphism object,
 it extends this by adding a vtable pointer to each object to enforce efficiency, cover more types and avoid crash issue. In the following, we will detail how Hextype and type++ work.
 
-\subsubsection{Hextype}
-
+\adrbqt{Are those paragraphs needed?}
+\subsection{Hextype}
 What I want to talk about Hextype?
 \begin{itemize}
        \item What is Hextype?
        \item How does it work?
-       \item Its limitations
+       \item Its limitations (detect type confusion from cast inside the hierarchy)
 \end{itemize}
 
-HexType is a Clang/LLVM-based type confusion sanitizer used to detect type confusion vulnerabilities in C++ programs. It relies on disjoint metadata to achieve type safety 
+HexType is a Clang/LLVM-based type confusion sanitizer used to detect type confusion vulnerabilities in C++ programs. 
+It relies on disjoint metadata to keep track of each type of each object and to check types correctness at runtime.
 
 \subsection{type++}
 
@@ -169,9 +170,8 @@ What I want to talk about type++?
 \begin{itemize}
        \item What is type++?
        \item How does it work?
-       \item Its limitations
+       \item Its limitations \adrbqt{To be discussed with Nicolas}
 \end{itemize}
-
 
 
 %%%%%%%%%%%%%%%%
@@ -184,18 +184,26 @@ how the design fits together.
 
 This section is usually 5-10 pages.
 
-My project:
-1. Explain test suite on initialization 
-2. Explain why it is a good benchmark to measure the efficiency of the solution
-3. Example of test cases
+\adrbqt{Is adding a paragraph on particular case such as phantom cast, multiple inheritance, placement new or allocation a good idea ?}
 
 \begin{itemize}
+       \item Threat model and aime of the suite 
        \item Why testing initialization? How is it relevant?
        \item Why is it a good benchmark? How to measure the efficiency of the solution?
        \item Constraint and limit of the test suite
        \item Example of test cases
 
 \end{itemize}
+
+\section{Benchmarking Type Confusion}
+
+Our threat model assumes that an adversary can exploit type confusion vulnerabilities to execute arbitrary code. 
+To evaluate how a sanitizer can detect types of confusion and, a fortiori, prevent such adversaries from exploiting these vulnerabilities, we build a test suite of type confusions. 
+The goal of the benchmark is to test 
+
+
+
+
 %%%%%%%%%%%%%%%%%%%%%%%%
 \chapter{Implementation}
 %%%%%%%%%%%%%%%%%%%%%%%%
