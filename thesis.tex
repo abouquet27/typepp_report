@@ -10,9 +10,13 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \documentclass[a4paper,11pt,oneside]{report}
 % Options: MScThesis, BScThesis, MScProject, BScProject
-\usepackage[MScThesis,lablogo]{EPFLreport}
+\usepackage[MScProject,lablogo]{EPFLreport}
 \usepackage{xspace}
 \usepackage{xcolor}
+\usepackage[chapter]{minted}
+\setminted{numbersep=3pt}
+\setminted{fontsize=\footnotesize}
+\usepackage{listings}
 
 \title{Building a robust test suite of type confusion vulnerabilities}
 \author{Adrien Bouquet}
@@ -32,8 +36,19 @@
 
 \begin{document}
 \maketitle
+\dedication{\textit{Program testing can be used to show the presence of bugs, but never to show their absence!}
+\begin{flushright}
+"Notes On Structured Programming" by Edsger W. Dijkstra, April 1970.
+\end{flushright}
+}
 \makededication
+\acknowledgments{
+I would like to thank my supervisor, Nicolas Badoux, for his guidance and support throughout this project. 
+Finally, I would like to thank my family and friends for their support
+}
 \makeacks
+
+
 
 \begin{abstract}
 
@@ -87,7 +102,77 @@ My project:
 1. Explain in more detail and with examples, C++ inheritance and casting
 2. Hextype and type++ paradigm and how they handle type confusion
 
-\section{C++ and Type Confusion}
+Type confusion happens frequently in C++. Due to the nature of the language, it is possible to cast a pointer from a type to another, 
+which can lead to memory corruption and security vulnerabilities. In this chapter, we will introduce C++ and type confusion \autoref{sec:cpp_type_confusion},
+expose the object-oriented programming, class hierarchies and inheritance in C++ \autoref{sec:cpp_oop}, and present the different type casting operators in C++ \autoref{sec:cpp_type_casting}. 
+Finally, we will present the different solutions to type confusion and how they handle it \autoref{sec:cpp_solutions}.
+
+\begin{listing}
+       \begin{minted}[frame=single,linenos, breaklines, escapeinside=||]{C++}
+#include <iostream>
+#include <string>
+#include <stdexcept>
+using namespace std;
+
+struct Base{ // Base class
+  string id = "Base";
+};
+
+class HarmlessDerived: public Base{ // Derived class 1
+  string name = "HarmlessDerived"; // private attribute
+public:
+  void setMyNameAndId(string name, string id){ // unsafe function
+    this->name = name; 
+    this->id = id;
+  }
+};
+
+class HarmfulDerived: public Base{ // Derived class 2
+  string myPassWord = "123456"; // private attribute (it should be protected)
+public:
+  void setMyPassword(string oldPassword, string newPassword){ // function we want to bypass
+    if(oldPassword == myPassWord){ // check if the old password is correct
+      myPassWord = newPassword; // change the password
+    } else {
+    throw invalid_argument("Invalid password");  
+    // throw an exception if the old password is incorrect
+    }  
+  }
+};
+
+class HarmfulUnrelated{ // Unrelated class
+  string id = "id";
+  string name = "HarmfulUnrelated";
+public:
+  void print(){ 
+    // function that print the name and id but could be more dangerous
+    cout << name << " " << id << endl;
+  };
+};
+
+int main(){
+  HarmfulDerived* harmful = new HarmfulDerived();
+  // change the password to "MyHardPassword"
+  harmful->setMyPassword("123456","MyHardPassword"); 
+
+  Base* base = harmful; // upcast 
+
+  // type confusion within the same class hierarchy
+  HarmlessDerived* harmless = static_cast<HarmlessDerived*>(base); 
+  // change the password by exploiting the type confusion 
+  harmless->setMyNameAndId("You've have been hacked","LOL"); 
+
+  // type confusion outside the class hierarchy
+  HarmfulUnrelated* unrelated = (HarmfulUnrelated*)static_cast<void*>(harmful);
+  unrelated->print(); // print illegally the new password
+  return 0;    
+}
+       \end{minted}
+       \caption{Example of type confusion in C++ within the same class hierarchy}
+       \label{lst:type_confusion}
+\end{listing}
+
+\section{C++ and Type Confusion} \label{sec:cpp_type_confusion}
 
 C++ is a general purpose programming language widely-used in a lot of domain such as operating systems, 
 or machine learning. Types are a core concept in C++ but are source of vulnerabilities. For instance, type confusion 
@@ -99,7 +184,7 @@ Theses wrong casts can occur when casting a pointer outside of the type hierarch
 when casting a pointer from a base class to a derived class. In the following, we will explain the object-oriented programming, class hierarchies and inheritance in C++ and how it can lead to type confusion. 
 We will then introduce the different type casting operators in C++ and how they can be used to cast a pointer from a type to another. Finally, we will present the different solutions to type confusion and how they handle it.
 
-\section{Object-Oriented Programming, Class Hierarchies and Inheritance}
+\section{Object-Oriented Programming, Class Hierarchies and Inheritance} \label{sec:cpp_oop}
 Object-Oriented Programming (OOP) is about creating objects which are instances of classes that contain both data and functions. This paradigm provides
 data abstraction, faster execution and code reusability. 
 
@@ -112,7 +197,7 @@ Polymporphism, is remarkably practical but leads to some issues. For instance, w
 it is possible to cast a pointer from one derived class to another in type casting by the base class.
 This is called type confusion and can lead to memory corruption and security vulnerabilities.
 
-\section{Type Casting}
+\section{Type Casting} \label{sec:cpp_type_casting}
 Typecasting is the operation of casting a pointer from a type to another. C++ provides four casting operators: \texttt{static\_cast}, \texttt{dynamic\_cast}, 
 \texttt{const\_cast} and \texttt{reinterpret\_cast}
 \adrbqt{Add an example of type casting}
@@ -137,7 +222,7 @@ Furthermore, the compiler translate C-style typecasting to (i) \texttt{const\_ca
 
 \adrbqt{check ISO/IEC 14882:2020 https://www.iso.org/standard/79358.html}
 
-\section{Solutions, Hextype and type++}
+\section{Solutions, Hextype and type++} \label{sec:cpp_solutions}
 
 As previously mentioned, type confusion vulnerabilities can lead to some memory corruption and security vulnerabilities which products such as Telegram (CVE-2021-31318, CVE-
 2021-31317) or Google Chromium (CVE-2021-30627,CVE-2022-1096, CVE-2022-1134, CVE-2022-2295) are exposed to. Hence, it is a problem that require to be handled for developer and user safety. 
@@ -152,7 +237,6 @@ Hextype is older and relies on disjoint metadata to achieve types correctness.
 Type++ is a recent solution and relies on existing metadata to achieve types correctness but unlike an approach based solely on existing metadata for Polymporphism object,
 it extends this by adding a vtable pointer to each object to enforce efficiency, cover more types and avoid crash issue. In the following, we will detail how Hextype and type++ work.
 
-\adrbqt{Are those paragraphs needed?}
 \subsection{Hextype}
 What I want to talk about Hextype?
 \begin{itemize}
@@ -196,19 +280,21 @@ This section is usually 5-10 pages.
 \section{Benchmarking Type Confusion}
 
 Our threat model assumes that an adversary can exploit type confusion vulnerabilities to execute arbitrary code. 
-We built a test suite with a multitude of cases to evaluate how a sanitizer can detect these types confusion and, 
+We built a test suite with a multitude of cases to evaluate how a sanitizer or a C++ dialect can detect these types confusion and, 
 a fortiori, try to prevent such adversaries from exploiting these vulnerabilities,
-We particularly focus on the initialization of objects and pointers, because it is at initialization step that 
-both methods operate, one by adding a vtable pointer to every object and the other by recording all necessary 
-information in its disjoint metadata. Then, we try to create various special test cases to trigger 
-type confusion vulnerabilities that can occur in C++ programs. 
+We particularly focus on the initialization, modifications and deletion of objects and pointers. At initialization step 
+both methods act on values to keep track of their types, type++ by adding a vtable pointer to every object and Hextype by recording all necessary 
+information in its disjoint metadata. Then we try modify the pointers by casting, modifying the object referenced to, 
+or deleting a pointer and reusing it to observe if it correctly detects type confusion. The last examples is particularly interesting
+for Hextype due to its nature. In fact, we want Hextype to replace the type of the object inside its type table when modifying 
+the corresponding pointer. Theses aspects are known to be backpain points for Hextype. Furthermore, we want to test each solutions
+on dynamic memory allocation styles such as \texttt{malloc} or \texttt{calloc}. 
 
-We want to compare the results of Hextype and type++, individually and between them. The benchmark quality resides 
+We want to compare the results obtained from Hextype and type++, individually and between them. The benchmark quality resides 
 in the diversity and coverage offered by most of the tests. In the following we will concentrate on C++11,
 although there are more recent versions with more features dedicated to OOP. In addition, we mainly test the standard
 C++11 without any external libraries or frameworks to simplify and evaluate the basis of the language itself. Later on,
 it could be interesting to extends the test suite to more recent versions of C++ and to external libraries. 
-
 
 %%%%%%%%%%%%%%%%%%%%%%%%
 \chapter{Implementation}
