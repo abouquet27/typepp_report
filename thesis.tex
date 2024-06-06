@@ -161,13 +161,13 @@ void typeConfusionOutsideHierarchy(Base* base) { // Type confusion outside the h
 }
 
 int main() {
-       Password* password = new Password("MyHardPassword"); // Password initialization |\label{code:password}|
-       Base* base = password; // upcast to base class
-       password->printPassword(); // print "MyHardPassword"
+       Password password("MyHardPassword"); // Password initialization |\label{code:password}|
+       Base* base = &password; // upcast to base class
+       password.printPassword(); // print "MyHardPassword"
        typeConfusionInHierarchy(base); // polymorphism |\label{code:polymorphism}|
-       password->printPassword(); // print "You've been hacked"
-       typeConfusionOutsideHierarchy(password);
-       password->printPassword(); // print "You've been hacked twice"
+       password.printPassword(); // print "You've been hacked"
+       typeConfusionOutsideHierarchy(&password);
+       password.printPassword(); // print "You've been hacked twice"
        return 0;
 }
        \end{minted}
@@ -273,27 +273,70 @@ This section is usually 5-10 pages.
        \item Threat model and aim of the suite 
        \item Why testing initialization? How is it relevant?
        \item Why is it a good benchmark? How to measure the efficiency of the solution?
-
+       \item \begin{itemize}
+              \item Direct initialization
+              \item Copy initialization
+              \item 
+              \item Modifying the object
+              \item Deleting the pointer
+              \end{itemize}
+       \item Phantom Casting
+       \item 
 \end{itemize}
 
-\section{Benchmarking Type Confusion}
-
+As previously discussed, type confusion sanitizers are designed to detect type confusion vulnerabilities in C++ programs. 
 Our threat model assumes that an adversary can exploit type confusion vulnerabilities to execute arbitrary code. 
 We built a test suite with a multitude of cases to evaluate how a sanitizer or a C++ dialect can detect these types confusion and, 
 a fortiori, try to prevent such adversaries from exploiting these vulnerabilities,
-We particularly focus on the initialization, modifications and deletion of objects and pointers. At initialization step 
-both methods act on values to keep track of their types, type++ by adding a vtable pointer to every object and Hextype by recording all necessary 
-information in its disjoint metadata. Then we try modify the pointers by casting, modifying the object referenced to, 
-or deleting a pointer and reusing it to observe if it correctly detects type confusion. The last examples is particularly interesting
-for Hextype due to its nature. In fact, we want Hextype to replace the type of the object inside its type table when modifying 
-the corresponding pointer. Theses aspects are known to be backpain points for Hextype. Furthermore, we want to test each solutions
-on dynamic memory allocation styles such as \texttt{malloc} or \texttt{calloc}. 
+In this chapter, we will present the design of the test suite for type confusion vulnerabilities, which decisions or 
+language specifications we want to evaluate the sanitizer on.
 
-We want to compare the results obtained from Hextype and type++, individually and between them. The benchmark quality resides 
-in the diversity and coverage offered by most of the tests. In the following we will concentrate on C++11,
-although there are more recent versions with more features dedicated to OOP. In addition, we mainly test the standard
-C++11 without any external libraries or frameworks to simplify and evaluate the basis of the language itself. Later on,
-it could be interesting to extends the test suite to more recent versions of C++ and to external libraries. 
+\section{Benchmarking Type Confusion}
+
+\subsection{Initialization}
+
+The benchmark particularly focus on the initialization, modification and deletion of objects and pointers. At initialization step 
+both methods act on values to keep track of their types, type++ by adding a vtable pointer to every object and Hextype by 
+recording all necessary information in its disjoint metadata. 
+First, we create basic tests cases to evaluate the efficiency of the sanitizer 
+on simple type confusion. In the following, we will present various specific forms of object initialization on which 
+we will evaluate the sanitizers.
+
+\textbf{\href{https://en.cppreference.com/w/cpp/language/direct_initialization}{Direct initialization}}
+
+\noindent{} Direct initialization is the simplest way to initialize an object and thus essential to measure if 
+sanitizers efficiency. It consists of a creating an object from a set of arguments. 
+In fact in Listing \autoref{lst:type_confusion}, \texttt{password} is directly initialized with the string "MyHardPassword"
+at line \ref{code:password}. 
+
+\textbf{\href{https://en.cppreference.com/w/cpp/language/copy_initialization}{Copy initialization}}
+
+\noindent{} Copy initialization is another way to initialize an object and is also essential to measure if
+sanitizers efficiency. It consists of creating an object from another object. With Copy initialization, we want to 
+ensure that a sanitzer keep track of the type of an object when it is copied. If we copy an object of a derived class,
+we expect it to keep track of the type of the object and not to be confused by the type of the object from which it was copied.
+
+\textbf{\href{https://en.cppreference.com/w/cpp/language/list_initialization}{List initialization}}
+
+\noindent{} List initialization is a way to initialize an object from a list of arguments using the curly braces.
+It is a more recent way to initialize an object and is particularly interesting to evaluate the efficiency of the sanitizer.
+Arguments can also be object. We want to be as sure as possible that the sanitizer can keep track of the type of the object
+and of its arguments. It can be directly or copy initialized.
+
+\textbf{Malloc and Calloc}
+
+\noindent{} Malloc and calloc are two functions originally from C that are used to allocate memory on the heap. At first, they
+return a void pointer that can be cast to any type. Depending on the size of the memory allocated, it can contain multiple objects.
+Thus, it is interesting to observe how the sanitizer behaves when the memory is allocated with these functions and if they manage
+to keep track correctly of the type of the objects.
+
+\subsection{Modification \& Deletion}
+
+We try modify the pointers by casting, modifying the object referenced to, 
+or deleting a pointer and reusing it to observe if it correctly detects type confusion. These examples are particularly known to 
+be backpain points for Hextype due to its nature. In fact, we want Hextype to replace the type of the object inside its type table 
+when modifying the corresponding pointer. 
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%
 \chapter{Implementation}
@@ -314,6 +357,12 @@ How are we going to measure the results?
        \item How are we going to measure the results?
        \item Example of test cases
 \end{itemize}
+
+We want to compare the results obtained from Hextype and type++, individually and between them. The benchmark quality resides 
+in the diversity and coverage offered by most of the tests. In the following we will concentrate on C++11,
+although there are more recent versions with more features dedicated to OOP. In addition, we mainly test the standard
+C++11 without any external libraries or frameworks to simplify and evaluate the basis of the language itself. Later on,
+it could be interesting to extends the test suite to more recent versions of C++ and to external libraries. 
 
 
 %%%%%%%%%%%%%%%%%%%%

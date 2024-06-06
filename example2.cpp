@@ -18,12 +18,9 @@ class Password: public Base { // Derived class 2
               password = newPassword;
        }
        public:
-       Password(string newPassword) {
-              modifyPassword(newPassword);
-       }
-       void printPassword() {
-              cout << password << endl;
-       }
+       Password(string newPassword) { modifyPassword(newPassword); }
+
+       void printPassword() { cout << password << endl; }
 };
 
 class Unrelated { // Unrelated class
@@ -36,21 +33,21 @@ class Unrelated { // Unrelated class
 
 void typeConfusionInHierarchy(Base* base) { // Type confusion inside the hierarchy
        Dummy* dummy = static_cast<Dummy*>(base); //|\label{code:derived_type_confusion}|
-       dummy->printMessage("You've been hacked"); // Illegal access
+       dummy->printMessage("You've been hacked"); // Illegal access |\label{code:illegal_access1}|
 }
 
 void typeConfusionOutsideHierarchy(Base* base) { // Type confusion outside the hierarchy
        Unrelated* unrelated = reinterpret_cast<Unrelated*>(base); //|\label{code:unrelated_type_confusion}|
-       unrelated->doRandomStuffWithString("You've been hacked twice"); // Illegal access
+       unrelated->doRandomStuffWithString("You've been hacked twice"); // Illegal access |\label{code:illegal_access2}|
 }
 
 int main() {
-       Password* password = new Password("MyHardPassword"); // Password initialization |\label{code:password}|
-       Base* base = password; // upcast to base class
-       password->printPassword(); // print "MyHardPassword"
+       Password password("MyHardPassword"); // Password initialization |\label{code:password}|
+       Base* base = &password; // upcast to base class
+       password.printPassword(); // print "MyHardPassword"
        typeConfusionInHierarchy(base); // polymorphism |\label{code:polymorphism}|
-       password->printPassword(); // print "You've been hacked"
-       typeConfusionOutsideHierarchy(password);
-       password->printPassword(); // print "You've been hacked twice"
+       password.printPassword(); // print "You've been hacked"
+       typeConfusionOutsideHierarchy(&password);
+       password.printPassword(); // print "You've been hacked twice"
        return 0;
 }
