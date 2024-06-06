@@ -209,7 +209,7 @@ and thus is polymorphic, which constraint to use \texttt{dynamic\_cast} only on 
 Finally, C-style typecasting exists in C++ due to backward compatibility between both languages but highly discouraged due for instance to its lack of clarity for programmers. 
 Furthermore, the compiler translate C-style typecasting to (i) \texttt{const\_cast}, (ii) \texttt{static\_cast} and (iii) \texttt{reinterpret\_cast} in this preferred order which passes on the underlying types confusions.
 
-\section{Type confusions & Solutions} \label{sec:cpp_solutions}
+\section{Type confusions and Solutions} \label{sec:cpp_solutions}
 
 As previously mentioned, type confusion vulnerabilities can lead to some memory corruption and security vulnerabilities which products such as Telegram (CVE-2021-31318, CVE-
 2021-31317) or Google Chromium (CVE-2021-30627,CVE-2022-1096, CVE-2022-1134, CVE-2022-2295) are exposed to. Listing \autoref{lst:type_confusion} shows an example of a type confusion.
