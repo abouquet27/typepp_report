@@ -117,58 +117,58 @@ Finally, we will present the different solutions to type confusion and how they 
 
 \begin{listing}
        \begin{minted}[frame=single,linenos, breaklines, escapeinside=||]{C++}
-#include <iostream>
 #include <string>
-#include <stdexcept>
+#include <iostream>
 using namespace std;
 
-class Base{ public: string id = "Base";}; // Base class
-
-class Dummy: public Base{ // Derived class 1
-  string name = "Dummy"; // private attribute
-public:
-  void setMyNameAndId(string name, string id){ // unsafe function
-    this->name = name; 
-    this->id = id;
-  }
+class Base {}; // Base class
+class Dummy: public Base { // Derived class
+       public:
+       virtual void printMessage(string message) {
+              cout << message << endl;
+       }
+       
 };
 
-class Password: public Base{ // Derived class 2
-  string myPassWord = "123456"; // private attribute (it should be protected)
-public:
-  void setMyPassword(string oldPassword, string newPassword){ // function we want to bypass
-    if(oldPassword == myPassWord){ // check if the old password is correct
-      myPassWord = newPassword; // change the password
-    } else {
-    throw invalid_argument("Invalid password");  
-    // throw an exception if the old password is incorrect
-    }  
-  }
+class Password: public Base { // Derived class 2
+       string password = "empty";
+       // private function that cannot be accessed from outside the class
+       virtual void modifyPassword(string newPassword) {
+              password = newPassword;
+       }
+       public:
+       Password(string newPassword) { modifyPassword(newPassword); }
+
+       void printPassword() { cout << password << endl; }
 };
 
-class Unrelated{ // Unrelated class
-  string id = "id";
-  string name = "Unrelated";
-public:
-  void print() { cout << name << " " << id << endl; };
+class Unrelated { // Unrelated class
+       public: 
+       virtual void doRandomStuffWithString(string str) {
+              /* random stuff*/
+              cout << str << endl;
+       }
 };
 
-void doStuff(Base* base){
-  // type confusion within the same class hierarchy
-  Dummy* dummy = static_cast<Dummy*>(base); |\label{code:derived_type_confusion}|
-  // change the password by exploiting the type confusion 
-  dummy->setMyNameAndId("You've have been hacked","LOL");      
+void typeConfusionInHierarchy(Base* base) { // Type confusion inside the hierarchy
+       Dummy* dummy = static_cast<Dummy*>(base); |\label{code:derived_type_confusion}|
+       dummy->printMessage("You've been hacked"); // Illegal access |\label{code:illegal_access1}|
 }
 
-int main(){
-  Password* password = new Password();   // change the password to "MyHardPassword"
-  password->setMyPassword("123456","MyHardPassword"); |\label{code:password}|
-  Base* base = password; // upcast 
-  doStuff(base); |\label{code:polymorphism}| // type confusion within the same class hierarchy
-  // type confusion outside the class hierarchy
-  Unrelated* unrelated = (Unrelated*)reinterpret_cast<void*>(password); |\label{code:unrelated_type_confusion}|
-  unrelated->print(); // print illegally the new password
-  return 0;    
+void typeConfusionOutsideHierarchy(Base* base) { // Type confusion outside the hierarchy
+       Unrelated* unrelated = reinterpret_cast<Unrelated*>(base); |\label{code:unrelated_type_confusion}|
+       unrelated->doRandomStuffWithString("You've been hacked twice"); // Illegal access |\label{code:illegal_access2}|
+}
+
+int main() {
+       Password* password = new Password("MyHardPassword"); // Password initialization |\label{code:password}|
+       Base* base = password; // upcast to base class
+       password->printPassword(); // print "MyHardPassword"
+       typeConfusionInHierarchy(base); // polymorphism |\label{code:polymorphism}|
+       password->printPassword(); // print "You've been hacked"
+       typeConfusionOutsideHierarchy(password);
+       password->printPassword(); // print "You've been hacked twice"
+       return 0;
 }
        \end{minted}
        \caption{Example of type confusion in C++ within the same class hierarchy}
@@ -178,7 +178,7 @@ int main(){
 \section{Object-Oriented Programming, Class Hierarchies and Inheritance} \label{sec:cpp_oop}
 Object-Oriented Programming (OOP) is about creating objects which are instances of classes that contain both data and functions. This paradigm provides
 data abstraction, faster execution and code reusability. Classes are organized in hierarchies, generally with one base class and one derived class, and can inherit attributes and methods from other classes which they
-they can use or override. In Listing \autoref{lst:type_confusion}, the classes \texttt{Password} and \texttt{Dummy} are derived from the base class \texttt{Base}, 
+they can use or override. In Listing \autoref{lst:type_confusion}, classes \texttt{Password} and \texttt{Dummy} are derived from the base class \texttt{Base}, 
 whereas the class \texttt{Unrelated} is unrelated to their class hierarchy.
 A derived class can have multiple base classes and thus possesses all the methods and attributes from its base classes. 
 Furthermore, a derived class is a subtype of its base class, meaning that a derived class can be used in place of its base class e.g., at line \ref{code:polymorphism}
@@ -209,24 +209,32 @@ and thus is polymorphic, which constraint to use \texttt{dynamic\_cast} only on 
 Finally, C-style typecasting exists in C++ due to backward compatibility between both languages but highly discouraged due for instance to its lack of clarity for programmers. 
 Furthermore, the compiler translate C-style typecasting to (i) \texttt{const\_cast}, (ii) \texttt{static\_cast} and (iii) \texttt{reinterpret\_cast} in this preferred order which passes on the underlying types confusions.
 
-\section{Solutions, Hextype and type++} \label{sec:cpp_solutions}
+\section{Type confusions & Solutions} \label{sec:cpp_solutions}
 
 As previously mentioned, type confusion vulnerabilities can lead to some memory corruption and security vulnerabilities which products such as Telegram (CVE-2021-31318, CVE-
 2021-31317) or Google Chromium (CVE-2021-30627,CVE-2022-1096, CVE-2022-1134, CVE-2022-2295) are exposed to. Listing \autoref{lst:type_confusion} shows an example of a type confusion.
 First, we define a base class \texttt{Base} and two derived classes \texttt{Dummy} and \texttt{Password} with their own attributes and methods. We set up the password to "MyHardPassword" (line \ref{code:password}) of a our class. 
-The password pointer is cast to its base and passed to a function \texttt{doStuff} which cast it to a \texttt{Dummy*}. This a type confusion within the same class hierarchy. 
-Then, the password pointer is cast to an unrelated class \texttt{Unrelated} and printed. This is a type confusion outside the class hierarchy.
+A type confusion inside of a type hierarchy can occur when there is a cast from a base to a derived class.
+In our example, the password pointer is cast to its base and passed (line \ref{code:polymorphism}) to \texttt{typeConfusionInHierarchy()} (line \ref{code:illegal_access1}) which cast it to a \texttt{Dummy*} (line \ref{code:derived_type_confusion}). 
+From this line, the behavior is undefined and can lead to memory corruption. Even if it's calling \texttt{printMessage()} of \texttt{Dummy}, it will execute \texttt{modifyPassword()} which will modify our password. 
+This behavior is due to object being a \texttt{Password} object and it will called \texttt{modifyPassword()} method.
+A type confusion outside of a type hierarchy can occur when there is a cast from a base to an unrelated class. 
+We can observe this behavior in \texttt{typeConfusionOutsideHierarchy()} (line \ref{code:illegal_access2})  where the password pointer is cast to an \texttt{Unrelated*} (line \ref{code:unrelated_type_confusion}).
+Calling \texttt{doRandomStuffWithString()} will call in fact \texttt{modifyPassword()} and modify our password a second time. 
+An adversary could exploit those vulnerabilities, especially if there is a way for him to give some input to the program. 
+However, some downcast or unrelated cast be legitimate when the programmer is sure of the type of the object, and we want to avoid false positive as well as false negative.
+
 Hence, it is a problem that require to be handled for developer and user safety. 
 The compiler checks statically the correctness of each cast to ensure that the types are compatible but it does not guarantee the same correctness at runtime, 
 because for instance an object of a derived class can be used in place of an object of a base class due to polymorphism and vice versa as in line \ref{code:polymorphism}. 
 To detect type confusion at runtime, there exists two approaches: (i) relying on disjoint metadata, such as type table to keep track of each type of each object or trees for type hierarchy, and 
 (ii) relying on existing metadata, such as Runtime Type Information (RTTI) and vtables. 
 Generally, the first approach is more efficient because it covers more types but it introduces overhead and performance issues. The second is faster but less efficient due to its limitation to polymorphic classes and it caused some crash issue. 
-In this paper, we will focus and compare on two solutions: Hextype and type++. 
-Both solutions checks types correctness at runtime but they differ in their approach. Comparing them offers a perspective on the effectiveness of each approach, despite the age difference between the development of these two solutions.
-Hextype is older and relies on disjoint metadata to achieve types correctness. 
-Type++ is a recent solution and relies on existing metadata to achieve types correctness but unlike an approach based solely on existing metadata for polymorphism object,
-it extends this by adding a vtable pointer to each object to enforce efficiency, cover more types and avoid crash issue. In the following, we will detail how Hextype and type++ work.
+In this paper, we will focus and compare on two methods: Hextype and type++. 
+Both checks types correctness at runtime but they differ in their approach. Hextype is older and relies on disjoint metadata to achieve types correctness. 
+Type++ is a recent C++ dialect and relies on existing metadata to achieve types correctness but unlike an approach based solely on existing metadata for polymorphism object,
+it extends this by adding a vtable pointer to each object to increase efficiency, cover more types and avoid crash issue. In the following, we will detail how Hextype and type++ work. 
+Comparing them offers a perspective on the effectiveness of each approach, despite the age difference between the development of these two solutions.
 
 \subsection{Hextype}
 What I want to talk about Hextype?
