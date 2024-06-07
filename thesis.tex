@@ -102,18 +102,27 @@ My project:
 1. Explain in more detail and with examples, C++ inheritance and casting
 2. Hextype and type++ paradigm and how they handle type confusion
 
-C++ is a general purpose programming language widely-used in a lot of domain such as operating systems, 
-or machine learning. Types are a core concept in C++ but are source of vulnerabilities. For instance, type confusion 
-is a common security issue in C++, which occurs when the compiler misinterpret a pointer type generally after a wrong typecasting and,
-that can lead to memory corruption and security vulnerabilities. An adversary can then exploit this vulnerability to execute arbitrary code, heap corruption and hijack the control-flow.
-Such an attack occured in the past in V8 in Google Chrome, where it allowed a remote attacker to potentially exploit
-heap corruption via a crafted HTML page (CVE-2023-3079). Hence, it is crucial to detect wrong typecasting which induce type confusion. 
-These wrong casts can occur when casting a pointer outside of a type hierarchy (\texttt{char*} to \texttt{void*} then casting to another type, see line \ref{code:unrelated_type_confusion} in Listing \autoref{lst:type_confusion}) 
-and inside a type hierarchy with classes and object-oriented programming e.g., casting a pointer from a base class to a derived class. 
-which can lead to memory corruption and security vulnerabilities. In this chapter, we will
-expose the object-oriented programming, class hierarchies and inheritance in C++ \autoref{sec:cpp_oop}, 
-and present the different type casting operators in C++ \autoref{sec:cpp_type_casting}. 
-Finally, we will present the different solutions to type confusion and how they handle it \autoref{sec:cpp_solutions}.
+C++ is a general purpose programming language widely-used in a lot of domain
+such as operating systems, or machine learning. Types are a core concept in C++
+but are source of vulnerabilities. For instance, type confusion is a common
+security issue in C++, which occurs when the compiler misinterpret a pointer
+type generally after a wrong typecasting and, that can lead to memory corruption
+and security vulnerabilities. An adversary can then exploit this vulnerability
+to execute arbitrary code, heap corruption and hijack the control-flow.  Such an
+attack occured in the past in V8 in Google Chrome, where it allowed a remote
+attacker to potentially exploit heap corruption via a crafted HTML page
+(CVE-2023-3079). Hence, it is crucial to detect wrong typecasting which induce
+type confusion.  These wrong casts can occur when casting a pointer outside of a
+type hierarchy (\texttt{char*} to \texttt{void*} then casting to another type,
+see line \ref{code:unrelated_type_confusion} in Listing
+\autoref{lst:type_confusion}) and inside a type hierarchy with classes and
+object-oriented programming e.g., casting a pointer from a base class to a
+derived class.  which can lead to memory corruption and security
+vulnerabilities. In this chapter, we will expose the object-oriented
+programming, class hierarchies and inheritance in C++ \autoref{sec:cpp_oop}, and
+present the different type casting operators in C++
+\autoref{sec:cpp_type_casting}.  Finally, we will present the different
+solutions to type confusion and how they handle it \autoref{sec:cpp_solutions}.
 
 \begin{listing}
        \begin{minted}[frame=single,linenos, breaklines, escapeinside=||]{C++}
