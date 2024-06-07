@@ -289,9 +289,9 @@ object of a base class due to polymorphism and vice versa as in line
 approaches: (i) relying on disjoint metadata, such as type table to keep track
 of each type of each object or trees for type hierarchy, and (ii) relying on
 existing metadata Runtime Type Information (RTTI), such as vtables. 
-Generally, the first approach is more efficient because it covers more types, but
+Generally, the first approach is more complete because it covers more types, but
 it introduces overhead and performance issues. The second is faster but less
-efficient due to its limitation to polymorphic classes, and it caused some crash
+complete due to its limitation to polymorphic classes, and it caused some crash
 issue.  In this paper, we will focus and compare on two methods: Hextype and
 type++.  Both checks types correctness at runtime, but they differ in their
 approach. Hextype is older and relies on disjoint metadata to achieve types
@@ -572,50 +572,42 @@ int main(){
 \chapter{Evaluation}
 %%%%%%%%%%%%%%%%%%%%
 
-In the evaluation you convince the reader that your design works as intended.
-Describe the evaluation setup, the designed experiments, and how the
-experiments showcase the individual points you want to prove.
-
-This section is usually 5-10 pages.
-
-Evalutates the test suite, explain the results
-Stats that could be useful for a single sanitizers:
-\begin{itemize}
-       \item Correctness: Number of type confusion detected and classified as type confusion by the sanitizer while they were
-       \item False positive: Number of type confusion detected and classified as type confusion by the sanitizer while they weren't ones
-       \item False negative: Number of type confusion missed by the sanitizer i.e., classified as not type confusion but they were
-
-       \item type confusion detected and well classified by both
-       \item type confusion missed by one of the two
-       \item type confusion missed by both
-
-       \item Constraint and limit of the test suite
-
-\end{itemize}
-
-Give intuition on how to improve the current mechanisms
-
-Later on,
-it could be interesting to extend the test suite to more recent versions of C++
-and to external library. 
-
-We first evaluate each mechanism separately and then compare them. Subsequently,
-we will discuss the results and the limitations of the test suite.
+We first evaluate each mechanism separately. Subsequently,
+we will compare them, discuss the results and the limitations of the test suite.
 
 \textbf{Type++}
 
 \noindent{}Over the 38 test cases we created, type++ passes 35 and 
-fails 3 of them. 2 of the failed due to multiple inheritance. The main issue 
-is that type++ does not handle multiple inheritance. The test \texttt{multiple_parent.cpp},
+fails 3 of them. 2 of the failed due to multiple inheritanc, which make 
+92\.1\% of success rate. The main issue 
+is that type++ does not handle multiple inheritance. The test \texttt{multiple\_parent},
 a simple test case with a class that inherits from two classes. When we create an object
 of the second base class and cast it to the derived class, it should be detected as a type confusion.
-However type++ does not detect it and classifies it as "missed". 
-The second test case that failed is \texttt{union_casting.cpp}, where we try to cast a pointer on a union
+However, type++ does not detect it and classifies it as "missed". 
+The last test case that failed is \texttt{union\_casting}, where we try to cast a pointer on a union
 to a pointer of a value inside the union. This test case is not detected as a type confusion by type++.
 
 \textbf{Hextype}
 
-\noindent{}Over the 38 test cases we created, Hextype passes 31 and fails 7 of them.
+\noindent{}Over the 38 test cases we created, Hextype passes 31 and 
+fails 7 of them which makes 81\.6\% of success rate.
+The main reason that justifies these failures is that Hextype does not handle very well
+C-style allocators. 4 test fail because of them. As we mentioned previously, these allocators
+are known to be a challenge for Hextype and its misses when we initialize object inside allocated memory. 
+Regarding the last 3 failed test cases, 2 are caused by vectors and the last one is due to unions. 
+
+\textbf{Discussion}
+
+\noindent{}When comparing the two mechanisms numerically, we can see that type++ is more complete than Hextype.
+Indeed, type++ detects more derived type confusion than Hextype. Another advantage of type++ is that it
+detects unrelated type confusion, which Hextype does not. Any idea to increase the completeness of Hextype would be 
+to enforce the type table on all objects and not only on allocated object.  
+
+The objective of the test suite is to evaluate the mechanisms on a range of cases, and to trigger 
+some edge cases that are known to be difficult to handle for sanitizers. However, it is important to highlight 
+that our test suite has been made manually and is not exhaustive. Furthermore, the benchmark is restricted to
+standard C++11 does not take into account from newer versions. It does not include external libraries or frameworks
+to simplify the evaluation of the mechanisms, but they could be interesting to evaluate in the future.
 
 
 %%%%%%%%%%%%%%%%%%%%%%
