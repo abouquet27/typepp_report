@@ -52,24 +52,15 @@ Finally, I would like to thank my family and friends for their support
 
 \begin{abstract}
 
-The abstract serves as an executive summary of your project.
-Your abstract should cover at least the following topics, 1-2 sentences for
-each: what area you are in, the problem you focus on, why existing work is
-insufficient, what the high-level intuition of your work is, maybe a neat
-design or implementation decision, and key results of your evaluation.
-
-My project: 
-Explain Type confusion, and why they are a problem i.e., memory attacks, safety, more control over types
-compare two mechanisms to type confusion.
-Goal of the paper i.e., creating a general benchmark for type confusion and explain the results
-
 C++ has a lot of vulnerabilities due to type confusion, which can lead to memory corruption 
 and security vulnerabilities. Casting a pointer from a type to another is a highly 
 common operation but, if misused, can lead to type confusion and thus can be exploited. 
 Hextype\cite{hextype} and Type++\cite{typepp} are two mechanisms that aim to detect type confusion at runtime.
 Although they achieve a high success rate, they can not ensure a perfect type safety.\\
-We propose a benchmark that evaluates a range of type confusion cases, on 
-
+We propose a benchmark that evaluates a range of type confusion cases by defining which 
+situations are likely to trigger type confusion. We evaluate it on Hextype and Type++ and
+we conclude that they achieve a high success rate even if they do not pass all the tests.
+In addition, we show that Type++ is more complete than Hextype as it detects more type confusion.
 
 \end{abstract}
 
@@ -79,20 +70,27 @@ We propose a benchmark that evaluates a range of type confusion cases, on
 \chapter{Introduction}
 %%%%%%%%%%%%%%%%%%%%%%
 
-The introduction is a longer writeup that gently eases the reader into your
-thesis~\cite{dinesh20oakland}. Use the first paragraph to discuss the setting.
-In the second paragraph you can introduce the main challenge that you see.
-The third paragraph lists why related work is insufficient.
-The fourth and fifth paragraphs discuss your approach and why it is needed.
-The sixth paragraph will introduce your thesis statement. Think how you can
-distill the essence of your thesis into a single sentence.
-The seventh paragraph will highlight some of your results
-The eights paragraph discusses your core contribution.
+According to \textit{The Importance of Being Earnest} (TIOBE) index, 
+C++ is the 3rd most used programming language in the world \cite{tiobe}, 
+exceeding even Java. Both languages have in common object-oriented programming,
+a paradigm that allows to organize code in objects that contain
+both data and functions. In C++, objects are organized in hierarchies, 
+from base classes to derived classes and derived classes inherit 
+the characteristics of their base classes. However, this feature can lead to
+type confusion vulnerabilities. A type confusion is a vulnerability that occurs 
+when a pointer is cast from a type to another type which is not compatible. 
+Hence, the compiler misinterprets the pointer. This mistyped pointer can be then 
+exploited by an adversary to execute arbitrary code, heap corruption and hijack the control-flow.
+For instance, in 2021, a type confusion vulnerability was discovered in Telegram\cite{telegram_cve} 
+and could allow an adversary to access the heap memory.\\
+To prevent these vulnerabilities, sanitizers such as Hextype\cite{hextype} and type++\cite{typepp} have been developed.
+These tools aim to detect type confusions at runtime. Even if they achieve a high success rate, 
+they can not ensure a perfect type safety, and we want to measure their completeness.\\
+In this paper, we propose a benchmark based on multiple perspectives of type confusion vulnerabilities.
+We present the concept of initialization, modification and deletion of objects, and some special cases that are
+worthwhile to evaluate due to their complexity. We evaluate this benchmark on Hextype and type++ and we conclude that
+they achieve a high success rate even if they do not pass all the tests. 
 
-My project: 
-1. Explain Type confusion, Hextype mechanism and type++ mechanism
-2. Measure type++ mechanism by assessing tests and compare it to Hextype
-3. Explain the aim of the paper, i.e. general benchmark for type confusion and how he achieves it
 
 %%%%%%%%%%%%%%%%%%%%
 \chapter{Background}
@@ -255,9 +253,9 @@ underlying types confusions.
 \section{Type confusions and Mechanisms} \label{sec:cpp_mechanisms}
 
 As previously mentioned, type confusion vulnerabilities can lead to some memory
-corruption and security vulnerabilities which products such as Telegram
-(CVE-2021-31318, CVE- 2021-31317) or Google Chromium
-(CVE-2021-30627,CVE-2022-1096, CVE-2022-1134, CVE-2022-2295) are exposed to.
+corruption and security vulnerabilities which products such as Telegram,
+(CVE-2021-31318\cite{telegram_cve}, CVE-2021-31317\cite{telegram_cve_2}) 
+or Google Chromium (CVE-2022-2295\cite{chromium}) are exposed to.
 Listing \autoref{lst:type_confusion} shows an example of a type confusion.
 First, we define a base class \texttt{Base} and two derived classes
 \texttt{Dummy} and \texttt{Password} with their own attributes and methods. We
@@ -610,28 +608,24 @@ The objective of the test suite is to evaluate the mechanisms on a range of case
 some edge cases that are known to be difficult to handle for sanitizers. However, it is important to highlight 
 that our test suite has been made manually and is not exhaustive. Furthermore, the benchmark is restricted to
 standard C++11 does not take into account from newer versions. It does not include external libraries or frameworks
-to simplify the evaluation of the mechanisms, but they could be interesting to evaluate in the future.
+to simplify the evaluation of the mechanisms, but they could be interesting to evaluate in the future. Finally,
+we could also test other sanitizers to compare them with Hextype and type++ and evaluate the completeness of 
+our test suite.
 
 
 %%%%%%%%%%%%%%%%%%%%%%
 \chapter{Related Work}
 %%%%%%%%%%%%%%%%%%%%%%
 
-The related work section covers closely related work. Here you can highlight
-the related work, how it solved the problem, and why it solved a different
-problem. Do not play down the importance of related work, all of these
-systems have been published and evaluated! Say what is different and how
-you overcome some of the weaknesses of related work by discussing the 
-trade-offs. Stay positive!
-
-This section is usually 3-5 pages.
-
-Discuss other sanitizers, other mechanisms to type confusion,
-which may implements other mechanisms or same mechanisms but differently.
-
-If time allows, test other sanitizer
-
-
+Type confusions continue to be studied and 
+Hextype and type++ are not the only mechanisms that aim to detect them.
+TypeSan~\cite{typesan} is a type confusion detector also based on LLVM framework.
+Similarly to Hextype, TypeSan relies on disjoint metadata to keep track of each 
+type of each object and to check types correctness at runtime. However, TypeSan uses
+shadow memory scheme.\\
+More recently, we can mention TCD~\cite{tcd} a static type confusion detector. 
+Unlike the 3 mentioned above, it works by static analysis and is proven to 
+handle complex feature as multiple inheritance or placement new. 
 
 
 %%%%%%%%%%%%%%%%%%%%
@@ -642,7 +636,14 @@ In the conclusion you repeat the main result and finalize the discussion of
 your project. Mention the core results and why as well as how your system
 advances the status quo.
 
-Concludes the project 
+In conclusion, we have built a test suite based on C++ features and edge cases
+generating type confusion vulnerabilities. We have evaluated the completeness of 
+Hextype and type++ on type confusion vulnerabilities using our benchmark. We 
+have shown that type++ is more complete than Hextype as it detects more type confusion.
+Type++ achieve a 92\.1\% success rate whereas Hextype achieves an 81\.6\% success rate.
+We pointed out that Hextype does not handle well C-style allocators, that 
+type++ does not handle multiple inheritance, and they will serve as a basis for future work.
+
 \cleardoublepage
 \phantomsection
 \addcontentsline{toc}{chapter}{Bibliography}
