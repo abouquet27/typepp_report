@@ -108,7 +108,7 @@ is a common security issue in C++, which occurs when the compiler misinterpret a
 that can lead to memory corruption and security vulnerabilities. An adversary can then exploit this vulnerability to execute arbitrary code, heap corruption and hijack the control-flow.
 Such an attack occured in the past in V8 in Google Chrome, where it allowed a remote attacker to potentially exploit
 heap corruption via a crafted HTML page (CVE-2023-3079). Hence, it is crucial to detect wrong typecasting which induce type confusion. 
-Theses wrong casts can occur when casting a pointer outside of a type hierarchy (\texttt{char*} to \texttt{void*} then casting to another type, see line \ref{code:unrelated_type_confusion} in Listing \autoref{lst:type_confusion}) 
+These wrong casts can occur when casting a pointer outside of a type hierarchy (\texttt{char*} to \texttt{void*} then casting to another type, see line \ref{code:unrelated_type_confusion} in Listing \autoref{lst:type_confusion}) 
 and inside a type hierarchy with classes and object-oriented programming e.g., casting a pointer from a base class to a derived class. 
 which can lead to memory corruption and security vulnerabilities. In this chapter, we will
 expose the object-oriented programming, class hierarchies and inheritance in C++ \autoref{sec:cpp_oop}, 
@@ -221,7 +221,7 @@ This behavior is due to object being a \texttt{Password} object and it will call
 A type confusion outside of a type hierarchy can occur when there is a cast from a base to an unrelated class. 
 We can observe this behavior in \texttt{typeConfusionOutsideHierarchy()} (line \ref{code:illegal_access2})  where the password pointer is cast to an \texttt{Unrelated*} (line \ref{code:unrelated_type_confusion}).
 Calling \texttt{doRandomStuffWithString()} will call in fact \texttt{modifyPassword()} and modify our password a second time. 
-An adversary could exploit those vulnerabilities, especially if there is a way for him to give some input to the program. 
+An adversary could exploit vulnerabilities, especially if the programm takes some inputs to the program from its user. 
 However, some downcast or unrelated cast be legitimate when the programmer is sure of the type of the object, and we want to avoid false positive as well as false negative.
 
 Hence, it is a problem that require to be handled for developer and user safety. 
@@ -304,38 +304,59 @@ we will evaluate the sanitizers.
 
 \textbf{\href{https://en.cppreference.com/w/cpp/language/direct_initialization}{Direct initialization}}
 
-\noindent{} Direct initialization is the simplest way to initialize an object and thus essential to measure if 
+\noindent{}Direct initialization is the simplest way to initialize an object and thus essential to measure if 
 sanitizers efficiency. It consists of a creating an object from a set of arguments. 
 In fact in Listing \autoref{lst:type_confusion}, \texttt{password} is directly initialized with the string "MyHardPassword"
 at line \ref{code:password}. 
 
 \textbf{\href{https://en.cppreference.com/w/cpp/language/copy_initialization}{Copy initialization}}
 
-\noindent{} Copy initialization is another way to initialize an object and is also essential to measure if
+\noindent{}Copy initialization is another way to initialize an object and is also essential to measure if
 sanitizers efficiency. It consists of creating an object from another object. With Copy initialization, we want to 
 ensure that a sanitzer keep track of the type of an object when it is copied. If we copy an object of a derived class,
 we expect it to keep track of the type of the object and not to be confused by the type of the object from which it was copied.
 
 \textbf{\href{https://en.cppreference.com/w/cpp/language/list_initialization}{List initialization}}
 
-\noindent{} List initialization is a way to initialize an object from a list of arguments using the curly braces.
-It is a more recent way to initialize an object and is particularly interesting to evaluate the efficiency of the sanitizer.
+\noindent{}List initialization, directly or copy initialized, is a way to initialize an object from a list of arguments.
+It is a more recent way to initialize an object and is particularly worthwhile to evaluate the efficiency of the sanitizer.
 Arguments can also be object. We want to be as sure as possible that the sanitizer can keep track of the type of the object
-and of its arguments. It can be directly or copy initialized.
+and of its arguments. 
 
 \textbf{Malloc and Calloc}
 
-\noindent{} Malloc and calloc are two functions originally from C that are used to allocate memory on the heap. At first, they
+\noindent{}Malloc and calloc are two functions originally from C that are used to allocate memory on the heap. At first, they
 return a void pointer that can be cast to any type. Depending on the size of the memory allocated, it can contain multiple objects.
 Thus, it is interesting to observe how the sanitizer behaves when the memory is allocated with these functions and if they manage
 to keep track correctly of the type of the objects.
 
 \subsection{Modification \& Deletion}
 
-We try modify the pointers by casting, modifying the object referenced to, 
+\noindent{}Many edge cases happens when modifying the pointers by casting, modifying the object referenced to the pointer, 
+or deleting a pointer and reusing it to observe or in order to study the limitations of sanitizers. For instance, 
+\texttt{Placement New} keyword allows the programmer to construct an object at already allocated memory. 
+Within a same memory block, we can construct multiple objects of different types, which can lead to type confusion
+if these objects are not correctly initialized. Furthermore, we try modify the pointers by casting, modifying the object referenced to, 
 or deleting a pointer and reusing it to observe if it correctly detects type confusion. These examples are particularly known to 
-be backpain points for Hextype due to its nature. In fact, we want Hextype to replace the type of the object inside its type table 
-when modifying the corresponding pointer. 
+be backpain points for Hextype due to its nature. WWhen a pointer is modified or used after being deleted, Hextype should update 
+its type table to reflect the new type of the object but somtimes it fails to do so and produces false negatives or false positives.
+
+\subsection{Quirky cases}
+
+Some features of C++ behave in a specific manner with types or inheritance. Next, we expose some of them 
+which can be tricky to handle for a sanitizer on type confusion vulnerabilities:
+
+\textbf{Multiple Inheritance}
+
+\noindent{}Multiple inheritance is a feature of C++ that allows a class to inherit attributes and methods from multiple classes.
+It allows to create complex class hierarchies and does not restrict the programmer to a single inheritance per object. Furthermore,
+its application is truly advantageous when objects have to share multiple characteristics of several type hierarchies. 
+However, this exposes the code to a higher risk of type confusion, specially with the proliferation of these hierarchies.  
+
+\adrbqt{Example ?}
+\textbf{Union}
+\textbf{Phantom Casting}
+
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%
