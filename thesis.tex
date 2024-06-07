@@ -175,66 +175,121 @@ int main() {
        \label{lst:type_confusion}
 \end{listing}
 
-\section{Object-Oriented Programming, Class Hierarchies and Inheritance} \label{sec:cpp_oop}
-Object-Oriented Programming (OOP) is about creating objects which are instances of classes that contain both data and functions. This paradigm provides
-data abstraction, faster execution and code reusability. Classes are organized in hierarchies, generally with one base class and one derived class, and can inherit attributes and methods from other classes which they
-they can use or override. In Listing \autoref{lst:type_confusion}, classes \texttt{Password} and \texttt{Dummy} are derived from the base class \texttt{Base}, 
-whereas the class \texttt{Unrelated} is unrelated to their class hierarchy.
-A derived class can have multiple base classes and thus possesses all the methods and attributes from its base classes. 
-Furthermore, a derived class is a subtype of its base class, meaning that a derived class can be used in place of its base class e.g., at line \ref{code:polymorphism}
-a \texttt{Password} pointer is given instead of a \texttt{Base} pointer. This concept which is called 
-polymorphism, is remarkably practical but leads to some issues. For instance, when a base class has two derived classes that are not directly related to each other, 
-it is possible to cast a pointer from one derived class to another in type casting by the base class and induce type confusion, 
-as at line \ref{code:derived_type_confusion}, where a \texttt{Password*} is cast to a \texttt{Dummy*} after being cast to a \texttt{Base*}. 
+\section{Object-Oriented Programming, Class Hierarchies and Inheritance}
+\label{sec:cpp_oop} Object-Oriented Programming (OOP) is about creating objects
+which are instances of classes that contain both data and functions. This
+paradigm provides data abstraction, faster execution and code reusability.
+Classes are organized in hierarchies, generally with one base class and one
+derived class, and can inherit attributes and methods from other classes which
+they they can use or override. In Listing \autoref{lst:type_confusion}, classes
+\texttt{Password} and \texttt{Dummy} are derived from the base class
+\texttt{Base}, whereas the class \texttt{Unrelated} is unrelated to their class
+hierarchy.  A derived class can have multiple base classes and thus possesses
+all the methods and attributes from its base classes.  Furthermore, a derived
+class is a subtype of its base class, meaning that a derived class can be used
+in place of its base class e.g., at line \ref{code:polymorphism} a
+\texttt{Password} pointer is given instead of a \texttt{Base} pointer. This
+concept which is called polymorphism, is remarkably practical but leads to some
+issues. For instance, when a base class has two derived classes that are not
+directly related to each other, it is possible to cast a pointer from one
+derived class to another in type casting by the base class and induce type
+confusion, as at line \ref{code:derived_type_confusion}, where a
+\texttt{Password*} is cast to a \texttt{Dummy*} after being cast to a
+\texttt{Base*}. 
 
-\section{Type Casting} \label{sec:cpp_type_casting}
-Typecasting is the operation of casting a pointer from a type to another. C++ provides four casting operators: \texttt{static\_cast}, \texttt{dynamic\_cast}, 
-\texttt{const\_cast} and \texttt{reinterpret\_cast}. 
+\section{Type Casting} \label{sec:cpp_type_casting} Typecasting is the operation
+of casting a pointer from a type to another. C++ provides four casting
+operators: \texttt{static\_cast}, \texttt{dynamic\_cast}, \texttt{const\_cast}
+and \texttt{reinterpret\_cast}. 
 
-\texttt{\textbf{const\_cast}<target-type>(expression)} revokes the constness or volatileness of an object. Due to operator's behaviour, it does not impact type hierarchies and 
-thus does not lead to type confusion altough there are some issues with const\_cast.
+\texttt{\textbf{const\_cast}<target-type>(expression)} revokes the constness or
+volatileness of an object. Due to operator's behaviour, it does not impact type
+hierarchies and thus does not lead to type confusion altough there are some
+issues with const\_cast.
 
-\texttt{\textbf{static\_cast}<target-type>(expression)} cast an expression to a specified type while check at compile-time but not at runtime. Therefore, this reduces cast verification to checking the types 
-in the type hierarchy. It does not guarantee the types are compatible at runtime and places the onus back on programmers to ensure type correctness. Hence, it leads to a type confusion vulnerability when misused i.e.,
-casting from the base class to a derived class or when casting a pointer to a void pointer.
+\texttt{\textbf{static\_cast}<target-type>(expression)} cast an expression to a
+specified type while check at compile-time but not at runtime. Therefore, this
+reduces cast verification to checking the types in the type hierarchy. It does
+not guarantee the types are compatible at runtime and places the onus back on
+programmers to ensure type correctness. Hence, it leads to a type confusion
+vulnerability when misused i.e., casting from the base class to a derived class
+or when casting a pointer to a void pointer.
 
-\texttt{\textbf{reinterpret\_cast}<target-type>(expression)} similarly to static\_cast, it casts an expression to a specified type by reinterpreting the underlying bit pattern but with the difference 
-that it does not check neither at compile time nor at runtime. Hence, it can potentially cast two incompatible types and lead to type confusion. 
-It is also the programmer's responsibility to ensure the correctness of the target-type and the type of expression.
+\texttt{\textbf{reinterpret\_cast}<target-type>(expression)} similarly to
+static\_cast, it casts an expression to a specified type by reinterpreting the
+underlying bit pattern but with the difference that it does not check neither at
+compile time nor at runtime. Hence, it can potentially cast two incompatible
+types and lead to type confusion.  It is also the programmer's responsibility to
+ensure the correctness of the target-type and the type of expression.
 
-\texttt{\textbf{dynamic\_cast}<target-type>(expression)} cast safely an expression to a specified type and checks at compile-time and at runtime, unlike \texttt{static\_cast}, if the types are compatible. 
-To achieve the runtime check, \texttt{dynamic\_cast} must leverage heavy-weight metadata, Run Time Type Information (RTTI). However, RTTI is only available when the class has at least one virtual function 
-and thus is polymorphic, which constraint to use \texttt{dynamic\_cast} only on polymorphic classes.
+\texttt{\textbf{dynamic\_cast}<target-type>(expression)} cast safely an
+expression to a specified type and checks at compile-time and at runtime, unlike
+\texttt{static\_cast}, if the types are compatible.  To achieve the runtime
+check, \texttt{dynamic\_cast} must leverage heavy-weight metadata, Run Time Type
+Information (RTTI). However, RTTI is only available when the class has at least
+one virtual function and thus is polymorphic, which constraint to use
+\texttt{dynamic\_cast} only on polymorphic classes.
 
-Finally, C-style typecasting exists in C++ due to backward compatibility between both languages but highly discouraged due for instance to its lack of clarity for programmers. 
-Furthermore, the compiler translate C-style typecasting to (i) \texttt{const\_cast}, (ii) \texttt{static\_cast} and (iii) \texttt{reinterpret\_cast} in this preferred order which passes on the underlying types confusions.
+Finally, C-style typecasting exists in C++ due to backward compatibility between
+both languages but highly discouraged due for instance to its lack of clarity
+for programmers.  Furthermore, the compiler translate C-style typecasting to (i)
+\texttt{const\_cast}, (ii) \texttt{static\_cast} and (iii)
+\texttt{reinterpret\_cast} in this preferred order which passes on the
+underlying types confusions.
 
 \section{Type confusions and Solutions} \label{sec:cpp_solutions}
 
-As previously mentioned, type confusion vulnerabilities can lead to some memory corruption and security vulnerabilities which products such as Telegram (CVE-2021-31318, CVE-
-2021-31317) or Google Chromium (CVE-2021-30627,CVE-2022-1096, CVE-2022-1134, CVE-2022-2295) are exposed to. Listing \autoref{lst:type_confusion} shows an example of a type confusion.
-First, we define a base class \texttt{Base} and two derived classes \texttt{Dummy} and \texttt{Password} with their own attributes and methods. We set up the password to "MyHardPassword" (line \ref{code:password}) of a our class. 
-A type confusion inside of a type hierarchy can occur when there is a cast from a base to a derived class.
-In our example, the password pointer is cast to its base and passed (line \ref{code:polymorphism}) to \texttt{typeConfusionInHierarchy()} (line \ref{code:illegal_access1}) which cast it to a \texttt{Dummy*} (line \ref{code:derived_type_confusion}). 
-From this line, the behavior is undefined and can lead to memory corruption. Even if it's calling \texttt{printMessage()} of \texttt{Dummy}, it will execute \texttt{modifyPassword()} which will modify our password. 
-This behavior is due to object being a \texttt{Password} object and it will called \texttt{modifyPassword()} method.
-A type confusion outside of a type hierarchy can occur when there is a cast from a base to an unrelated class. 
-We can observe this behavior in \texttt{typeConfusionOutsideHierarchy()} (line \ref{code:illegal_access2})  where the password pointer is cast to an \texttt{Unrelated*} (line \ref{code:unrelated_type_confusion}).
-Calling \texttt{doRandomStuffWithString()} will call in fact \texttt{modifyPassword()} and modify our password a second time. 
-An adversary could exploit vulnerabilities, especially if the programm takes some inputs to the program from its user. 
-However, some downcast or unrelated cast be legitimate when the programmer is sure of the type of the object, and we want to avoid false positive as well as false negative.
+As previously mentioned, type confusion vulnerabilities can lead to some memory
+corruption and security vulnerabilities which products such as Telegram
+(CVE-2021-31318, CVE- 2021-31317) or Google Chromium
+(CVE-2021-30627,CVE-2022-1096, CVE-2022-1134, CVE-2022-2295) are exposed to.
+Listing \autoref{lst:type_confusion} shows an example of a type confusion.
+First, we define a base class \texttt{Base} and two derived classes
+\texttt{Dummy} and \texttt{Password} with their own attributes and methods. We
+set up the password to "MyHardPassword" (line \ref{code:password}) of a our
+class.  A type confusion inside of a type hierarchy can occur when there is a
+cast from a base to a derived class.  In our example, the password pointer is
+cast to its base and passed (line \ref{code:polymorphism}) to
+\texttt{typeConfusionInHierarchy()} (line \ref{code:illegal_access1}) which cast
+it to a \texttt{Dummy*} (line \ref{code:derived_type_confusion}).  From this
+line, the behavior is undefined and can lead to memory corruption. Even if it's
+calling \texttt{printMessage()} of \texttt{Dummy}, it will execute
+\texttt{modifyPassword()} which will modify our password.  This behavior is due
+to object being a \texttt{Password} object and it will called
+\texttt{modifyPassword()} method.  A type confusion outside of a type hierarchy
+can occur when there is a cast from a base to an unrelated class.  We can
+observe this behavior in \texttt{typeConfusionOutsideHierarchy()} (line
+\ref{code:illegal_access2})  where the password pointer is cast to an
+\texttt{Unrelated*} (line \ref{code:unrelated_type_confusion}).  Calling
+\texttt{doRandomStuffWithString()} will call in fact \texttt{modifyPassword()}
+and modify our password a second time.  An adversary could exploit
+vulnerabilities, especially if the programm takes some inputs to the program
+from its user.  However, some downcast or unrelated cast be legitimate when the
+programmer is sure of the type of the object, and we want to avoid false
+positive as well as false negative.
 
-Hence, it is a problem that require to be handled for developer and user safety. 
-The compiler checks statically the correctness of each cast to ensure that the types are compatible but it does not guarantee the same correctness at runtime, 
-because for instance an object of a derived class can be used in place of an object of a base class due to polymorphism and vice versa as in line \ref{code:polymorphism}. 
-To detect type confusion at runtime, there exists two approaches: (i) relying on disjoint metadata, such as type table to keep track of each type of each object or trees for type hierarchy, and 
-(ii) relying on existing metadata, such as Runtime Type Information (RTTI) and vtables. 
-Generally, the first approach is more efficient because it covers more types but it introduces overhead and performance issues. The second is faster but less efficient due to its limitation to polymorphic classes and it caused some crash issue. 
-In this paper, we will focus and compare on two methods: Hextype and type++. 
-Both checks types correctness at runtime but they differ in their approach. Hextype is older and relies on disjoint metadata to achieve types correctness. 
-Type++ is a recent C++ dialect and relies on existing metadata to achieve types correctness but unlike an approach based solely on existing metadata for polymorphism object,
-it extends this by adding a vtable pointer to each object to increase efficiency, cover more types and avoid crash issue. In the following, we will detail how Hextype and type++ work. 
-Comparing them offers a perspective on the effectiveness of each approach, despite the age difference between the development of these two solutions.
+Hence, it is a problem that require to be handled for developer and user safety.
+The compiler checks statically the correctness of each cast to ensure that the
+types are compatible but it does not guarantee the same correctness at runtime, 
+because for instance an object of a derived class can be used in place of an
+object of a base class due to polymorphism and vice versa as in line
+\ref{code:polymorphism}.  To detect type confusion at runtime, there exists two
+approaches: (i) relying on disjoint metadata, such as type table to keep track
+of each type of each object or trees for type hierarchy, and (ii) relying on
+existing metadata, such as Runtime Type Information (RTTI) and vtables. 
+Generally, the first approach is more efficient because it covers more types but
+it introduces overhead and performance issues. The second is faster but less
+efficient due to its limitation to polymorphic classes and it caused some crash
+issue.  In this paper, we will focus and compare on two methods: Hextype and
+type++.  Both checks types correctness at runtime but they differ in their
+approach. Hextype is older and relies on disjoint metadata to achieve types
+correctness.  Type++ is a recent C++ dialect and relies on existing metadata to
+achieve types correctness but unlike an approach based solely on existing
+metadata for polymorphism object, it extends this by adding a vtable pointer to
+each object to increase efficiency, cover more types and avoid crash issue. In
+the following, we will detail how Hextype and type++ work.  Comparing them
+offers a perspective on the effectiveness of each approach, despite the age
+difference between the development of these two solutions.
 
 \subsection{Hextype}
 What I want to talk about Hextype?
@@ -244,8 +299,10 @@ What I want to talk about Hextype?
        \item Its limitations (detect type confusion from cast inside the hierarchy)
 \end{itemize}
 
-HexType is a Clang/LLVM-based type confusion sanitizer used to detect type confusion vulnerabilities in C++ programs. 
-It relies on disjoint metadata to keep track of each type of each object and to check types correctness at runtime.
+HexType is a Clang/LLVM-based type confusion sanitizer used to detect type
+confusion vulnerabilities in C++ programs.  It relies on disjoint metadata to
+keep track of each type of each object and to check types correctness at
+runtime.
 
 \subsection{type++}
 
@@ -261,87 +318,116 @@ What I want to talk about type++?
 \chapter{Design}
 %%%%%%%%%%%%%%%%
 
-Type confusion sanitizers are designed to detect type confusion vulnerabilities in C++ programs. 
-Our threat model assumes that an adversary can exploit type confusion vulnerabilities to execute arbitrary code. 
-We built a test suite with a multitude of cases to evaluate how a sanitizer or a C++ dialect can detect these types confusion and, 
-a fortiori, try to prevent such adversaries from exploiting these vulnerabilities,
-In this chapter, we will present the design of the test suite for type confusion vulnerabilities, which decisions or 
-language specifications we want to evaluate the sanitizer on.
+Type confusion sanitizers are designed to detect type confusion vulnerabilities
+in C++ programs.  Our threat model assumes that an adversary can exploit type
+confusion vulnerabilities to execute arbitrary code.  We built a test suite with
+a multitude of cases to evaluate how a sanitizer or a C++ dialect can detect
+these types confusion and, a fortiori, try to prevent such adversaries from
+exploiting these vulnerabilities, In this chapter, we will present the design of
+the test suite for type confusion vulnerabilities, which decisions or language
+specifications we want to evaluate the sanitizer on.
 
 \section{Benchmarking Type Confusion}
 
 \subsection{Initialization}
 
-The benchmark particularly focus on the initialization, modification and deletion of objects and pointers. At initialization step 
-both methods act on values to keep track of their types, type++ by adding a vtable pointer to every object and Hextype by 
-recording all necessary information in its disjoint metadata. 
-First, we create basic tests cases to evaluate the efficiency of the sanitizer 
-on simple type confusion. In the following, we will present various specific forms of object initialization on which 
-we will evaluate the sanitizers.
+The benchmark particularly focus on the initialization, modification and
+deletion of objects and pointers. At initialization step both methods act on
+values to keep track of their types, type++ by adding a vtable pointer to every
+object and Hextype by recording all necessary information in its disjoint
+metadata.  First, we create basic tests cases to evaluate the efficiency of the
+sanitizer on simple type confusion. In the following, we will present various
+specific forms of object initialization on which we will evaluate the
+sanitizers.
 
-\textbf{\href{https://en.cppreference.com/w/cpp/language/direct_initialization}{Direct initialization}}
+\textbf{\href{https://en.cppreference.com/w/cpp/language/direct_initialization}{Direct
+initialization}}
 
-\noindent{}Direct initialization is the simplest way to initialize an object and thus essential to measure if 
-sanitizers efficiency. It consists of a creating an object from a set of arguments. 
-In fact in Listing \autoref{lst:type_confusion}, \texttt{password} is directly initialized with the string "MyHardPassword"
-at line \ref{code:password}. 
+\noindent{}Direct initialization is the simplest way to initialize an object and
+thus essential to measure if sanitizers efficiency. It consists of a creating an
+object from a set of arguments.  In fact in Listing
+\autoref{lst:type_confusion}, \texttt{password} is directly initialized with the
+string "MyHardPassword" at line \ref{code:password}. 
 
-\textbf{\href{https://en.cppreference.com/w/cpp/language/copy_initialization}{Copy initialization}}
+\textbf{\href{https://en.cppreference.com/w/cpp/language/copy_initialization}{Copy
+initialization}}
 
-\noindent{}Copy initialization is another way to initialize an object and is also essential to measure if
-sanitizers efficiency. It consists of creating an object from another object. With Copy initialization, we want to 
-ensure that a sanitzer keep track of the type of an object when it is copied. If we copy an object of a derived class,
-we expect it to keep track of the type of the object and not to be confused by the type of the object from which it was copied.
+\noindent{}Copy initialization is another way to initialize an object and is
+also essential to measure if sanitizers efficiency. It consists of creating an
+object from another object. With Copy initialization, we want to ensure that a
+sanitzer keep track of the type of an object when it is copied. If we copy an
+object of a derived class, we expect it to keep track of the type of the object
+and not to be confused by the type of the object from which it was copied.
 
-\textbf{\href{https://en.cppreference.com/w/cpp/language/list_initialization}{List initialization}}
+\textbf{\href{https://en.cppreference.com/w/cpp/language/list_initialization}{List
+initialization}}
 
-\noindent{}List initialization, directly or copy initialized, is a way to initialize an object from a list of arguments.
-It is a more recent way to initialize an object and is particularly worthwhile to evaluate the efficiency of the sanitizer.
-Arguments can also be object. We want to be as sure as possible that the sanitizer can keep track of the type of the object
-and of its arguments. 
+\noindent{}List initialization, directly or copy initialized, is a way to
+initialize an object from a list of arguments.  It is a more recent way to
+initialize an object and is particularly worthwhile to evaluate the efficiency
+of the sanitizer.  Arguments can also be object. We want to be as sure as
+possible that the sanitizer can keep track of the type of the object and of its
+arguments. 
 
 \textbf{Malloc and Calloc}
 
-\noindent{}Malloc and calloc are two functions originally from C that are used to allocate memory on the heap. At first, they
-return a void pointer that can be cast to any type. Depending on the size of the memory allocated, it can contain multiple objects.
-Thus, it is interesting to observe how the sanitizer behaves when the memory is allocated with these functions and if they manage
-to keep track correctly of the type of the objects.
+\noindent{}Malloc and calloc are two functions originally from C that are used
+to allocate memory on the heap. At first, they return a void pointer that can be
+cast to any type. Depending on the size of the memory allocated, it can contain
+multiple objects.  Thus, it is interesting to observe how the sanitizer behaves
+when the memory is allocated with these functions and if they manage to keep
+track correctly of the type of the objects.
 
 \subsection{Modification \& Deletion}
 
-\noindent{}Many edge cases happens when modifying the pointers by casting, modifying the object referenced to the pointer, 
-or deleting a pointer and reusing it to observe or in order to study the limitations of sanitizers. For instance, 
-\texttt{Placement New} keyword allows the programmer to construct an object at already allocated memory. 
-Within a same memory block, we can construct multiple objects of different types, which can lead to type confusion
-if these objects are not correctly initialized. Furthermore, we try modify the pointers by casting, modifying the object referenced to, 
-or deleting a pointer and reusing it to observe if it correctly detects type confusion. These examples are particularly known to 
-be backpain points for Hextype due to its nature. WWhen a pointer is modified or used after being deleted, Hextype should update 
-its type table to reflect the new type of the object but somtimes it fails to do so and produces false negatives or false positives.
+\noindent{}Many edge cases happens when modifying the pointers by casting,
+modifying the object referenced to the pointer, or deleting a pointer and
+reusing it to observe or in order to study the limitations of sanitizers. For
+instance, \texttt{Placement New} keyword allows the programmer to construct an
+object at already allocated memory.  Within a same memory block, we can
+construct multiple objects of different types, which can lead to type confusion
+if these objects are not correctly initialized. Furthermore, we try modify the
+pointers by casting, modifying the object referenced to, or deleting a pointer
+and reusing it to observe if it correctly detects type confusion. These examples
+are particularly known to be backpain points for Hextype due to its nature.
+WWhen a pointer is modified or used after being deleted, Hextype should update 
+its type table to reflect the new type of the object but somtimes it fails to do
+so and produces false negatives or false positives.
 
 \subsection{Quirky cases}
 
-Some features of C++ behave in a specific manner with types or inheritance. Next, we expose some of them 
-which can be tricky to handle for a sanitizer on type confusion vulnerabilities:
+Some features of C++ behave in a specific manner with types or inheritance.
+Next, we expose some of them which can be tricky to handle for a sanitizer on
+type confusion vulnerabilities:
 
 \textbf{Multiple Inheritance}
 
-\noindent{}Multiple inheritance is a feature of C++ that allows a class to inherit attributes and methods from multiple classes.
-It allows to create complex class hierarchies and does not restrict the programmer to a single inheritance per object. Furthermore,
-its application is truly advantageous when objects have to share multiple characteristics of several type hierarchies. 
-However, this exposes the code to a higher risk of type confusion, specially with the proliferation of these hierarchies.  
+\noindent{}Multiple inheritance is a feature of C++ that allows a class to
+inherit attributes and methods from multiple classes.  It allows to create
+complex class hierarchies and does not restrict the programmer to a single
+inheritance per object. Furthermore, its application is truly advantageous when
+objects have to share multiple characteristics of several type hierarchies. 
+However, this exposes the code to a higher risk of type confusion, specially
+with the proliferation of these hierarchies.  
 
 \textbf{Union}
 
-\noindent{}A union is a special class type that allows to store different types of data in the same memory location
-The feature is particularly useful for saving memory as only the last object assigned to it is actually stored, but 
-can be difficult to use and understand. When dealing with unions from the point of view of type confusion, 
-we must not confuse type confusion with undefined behaviour due to its nature. In fact, it is up to the programmer to ensure
-that the type of the value retrieve from the union is the correct one. Type confusions happens when 
-the value retrieved is correct but is wrongly cast to another type. For instance in Listing \autoref{lst:union}, 
-the pointer \texttt{u.b} references a \texttt{Base} object but is cast to a \texttt{Derived} object at line \ref{code:union_type_confusion}.
-This a real type confusion and should be detected by the sanitizer. However, at line \ref{code:union_undefined_behavior},
-the pointer \texttt{u.u} references the same object as \texttt{u.b}(due to union nature) but is cast to an \texttt{Unrelated} object. 
-Trying to access \texttt{u.u} will lead to undefined behavior but is not a type confusion.
+\noindent{}A union is a special class type that allows to store different types
+of data in the same memory location The feature is particularly useful for
+saving memory as only the last object assigned to it is actually stored, but can
+be difficult to use and understand. When dealing with unions from the point of
+view of type confusion, we must not confuse type confusion with undefined
+behaviour due to its nature. In fact, it is up to the programmer to ensure that
+the type of the value retrieve from the union is the correct one. Type
+confusions happens when the value retrieved is correct but is wrongly cast to
+another type. For instance in Listing \autoref{lst:union}, the pointer
+\texttt{u.b} references a \texttt{Base} object but is cast to a \texttt{Derived}
+object at line \ref{code:union_type_confusion}.  This a real type confusion and
+should be detected by the sanitizer. However, at line
+\ref{code:union_undefined_behavior}, the pointer \texttt{u.u} references the
+same object as \texttt{u.b}(due to union nature) but is cast to an
+\texttt{Unrelated} object.  Trying to access \texttt{u.u} will lead to undefined
+behavior but is not a type confusion.
 
 
 \begin{listing}
@@ -371,13 +457,14 @@ int main () {
 
 \textbf{Phantom Casting}
 
-\noindent{}Phantom casting occurs when a base class and a derived have the same data layout.
-In this case, it is authorized to cast a pointer from a base class to a derived class 
-even if the object is not of the derived class which should be classified as a type confusion.
-This special case exists because of backward compatibility of C++ with C. Listing \autoref{lst:phantom_casting} 
-shows an example of phantom casting at line \ref{code:phantom_casting}. 
-The pointer \texttt{base} references a \texttt{Base} object
-but is cast to a \texttt{Derived} object but this is allowed.
+\noindent{}Phantom casting occurs when a base class and a derived have the same
+data layout.  In this case, it is authorized to cast a pointer from a base class
+to a derived class even if the object is not of the derived class which should
+be classified as a type confusion.  This special case exists because of backward
+compatibility of C++ with C. Listing \autoref{lst:phantom_casting} shows an
+example of phantom casting at line \ref{code:phantom_casting}.  The pointer
+\texttt{base} references a \texttt{Base} object but is cast to a
+\texttt{Derived} object but this is allowed.
 
 \begin{listing}
        \begin{minted}[frame=single,linenos, breaklines, escapeinside=||]{C++}
@@ -416,31 +503,41 @@ How are we going to measure the results?
        \item Example of test cases
 \end{itemize}
 
-We want to compare the results obtained from Hextype and type++, individually and between them. The benchmark quality resides 
-in the diversity and coverage offered by most of the tests. In the following we will concentrate on C++11,
-although there are more recent versions with more features dedicated to OOP. In addition, we mainly test the standard
-C++11 without any external libraries or frameworks to simplify and evaluate the basis of the language itself. Later on,
-it could be interesting to extends the test suite to more recent versions of C++ and to external libraries. 
-In addition, we would describe some challenge we faced during the implementation of the test suite.
+We want to compare the results obtained from Hextype and type++, individually
+and between them. The benchmark quality resides in the diversity and coverage
+offered by most of the tests. In the following we will concentrate on C++11,
+although there are more recent versions with more features dedicated to OOP. In
+addition, we mainly test the standard C++11 without any external libraries or
+frameworks to simplify and evaluate the basis of the language itself. Later on,
+it could be interesting to extends the test suite to more recent versions of C++
+and to external libraries.  In addition, we would describe some challenge we
+faced during the implementation of the test suite.
 
 \textbf{Set up sanitizers}
 
-\noindent{}Setting up sanitizers was the first step in the implementation of the test suite.
-The test suite is designed to be run with Hextype and type++ to evaluate their efficiency on type confusion vulnerabilities. 
-It is located inside type++ architecture and did not need to be installed. However, Hextype had to be installed 
-and configured to be able to run the test suite. Hextype can only run up to C++14 and is not compatible with C++17 or C++20, 
-which is a limitation for the test suite. Furthermore, Hextype only triggers type confusion inside type hierarchy
-leaving out a lot of others whereas type++ triggers type confusion inside and outside. 
+\noindent{}Setting up sanitizers was the first step in the implementation of the
+test suite.  The test suite is designed to be run with Hextype and type++ to
+evaluate their efficiency on type confusion vulnerabilities.  It is located
+inside type++ architecture and did not need to be installed. However, Hextype
+had to be installed and configured to be able to run the test suite. Hextype can
+only run up to C++14 and is not compatible with C++17 or C++20, which is a
+limitation for the test suite. Furthermore, Hextype only triggers type confusion
+inside type hierarchy leaving out a lot of others whereas type++ triggers type
+confusion inside and outside. 
 
 \textbf{Correctly trigger type confusion}
 
-\noindent{}One challenge was to correctly create our test cases such that we create legitimate tyoe confusion.
-Unions, phatom casting and multiple inheritance were difficult to implement so that they generates legitimate type confusion 
-and not undefined behavior or valid cast. For instance, making simple test cases by having very simple base class and a derived class 
-could trigger phantom casting and hence no type confusion were spotted. On another hand, we spent a lot of time doing test cases on unions 
-before realising how to properly create confused types and not undefined behaviors. 
-In order to reproduce the test suite, it is important to have a a class structure that is not too complex but not too simple either, 
-such that it does not trigger phantom casting or multiple inheritance and treating those cases separately.
+\noindent{}One challenge was to correctly create our test cases such that we
+create legitimate tyoe confusion.  Unions, phatom casting and multiple
+inheritance were difficult to implement so that they generates legitimate type
+confusion and not undefined behavior or valid cast. For instance, making simple
+test cases by having very simple base class and a derived class could trigger
+phantom casting and hence no type confusion were spotted. On another hand, we
+spent a lot of time doing test cases on unions before realising how to properly
+create confused types and not undefined behaviors.  In order to reproduce the
+test suite, it is important to have a a class structure that is not too complex
+but not too simple either, such that it does not trigger phantom casting or
+multiple inheritance and treating those cases separately.
 
 \begin{listing}
        \begin{minted}[frame=single,linenos, breaklines, escapeinside=||]{C++}
