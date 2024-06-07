@@ -340,13 +340,14 @@ specifications we want to evaluate the sanitizer on.
 \section{Benchmarking Type Confusion}
 
 \subsection{Initialization}
+\nb{don't tie it yet to hextype type++, say creation is important because that we type is assigned}
 
 The benchmark particularly focus on the initialization, modification and
 deletion of objects and pointers. At initialization step both methods act on
 values to keep track of their types, type++ by adding a vtable pointer to every
 object and Hextype by recording all necessary information in its disjoint
 metadata.  First, we create basic tests cases to evaluate the efficiency of the
-sanitizer on simple type confusion. In the following, we will present various
+sanitizer on simple type confusion\nb{why is this sentence here? what does it has to do with initialization}. In the following, we will present various
 specific forms of object initialization on which we will evaluate the
 sanitizers.
 
@@ -357,32 +358,32 @@ initialization}}
 thus essential to measure if sanitizers efficiency. It consists of a creating an
 object from a set of arguments.  In fact in Listing
 \autoref{lst:type_confusion}, \texttt{password} is directly initialized with the
-string "MyHardPassword" at line \ref{code:password}. 
+string "MyHardPassword" at line \ref{code:password}. \nb{well done to add an example!}
 
 \textbf{\href{https://en.cppreference.com/w/cpp/language/copy_initialization}{Copy
 initialization}}
 
 \noindent{}Copy initialization is another way to initialize an object and is
-also essential to measure if sanitizers efficiency. It consists of creating an
+also essential to measure if sanitizers efficiency\nb{in term of what? speak of completness instead}. It consists of creating an
 object from another object. With Copy initialization, we want to ensure that a
 sanitzer keep track of the type of an object when it is copied. If we copy an
 object of a derived class, we expect it to keep track of the type of the object
-and not to be confused by the type of the object from which it was copied.
+and not to be confused by the type of the object from which it was copied\nb{a bit verbose}.
 
 \textbf{\href{https://en.cppreference.com/w/cpp/language/list_initialization}{List
 initialization}}
 
 \noindent{}List initialization, directly or copy initialized, is a way to
-initialize an object from a list of arguments.  It is a more recent way to
+initialize an object from a list of arguments.  It is a more recent way\nb{cite} to
 initialize an object and is particularly worthwhile to evaluate the efficiency
-of the sanitizer.  Arguments can also be object. We want to be as sure as
+of the sanitizer\nb{why? are we looking at efficency?}.  Arguments can also be object. We want to be as sure as
 possible that the sanitizer can keep track of the type of the object and of its
-arguments. 
+arguments. \nb{not sure what this sentence adds}
 
-\textbf{Malloc and Calloc}
+\textbf{Malloc and Calloc} \nb{what about new?}
 
-\noindent{}Malloc and calloc are two functions originally from C that are used
-to allocate memory on the heap. At first, they return a void pointer that can be
+\noindent{}Malloc and calloc \nb{what about realloc?} are two functions originally from C that are used
+to allocate memory on the heap\nb{what different than before? You should mention it also before if its different}. At first, they return a void pointer that can be
 cast to any type. Depending on the size of the memory allocated, it can contain
 multiple objects.  Thus, it is interesting to observe how the sanitizer behaves
 when the memory is allocated with these functions and if they manage to keep
@@ -393,20 +394,20 @@ track correctly of the type of the objects.
 \noindent{}Many edge cases happens when modifying the pointers by casting,
 modifying the object referenced to the pointer, or deleting a pointer and
 reusing it to observe or in order to study the limitations of sanitizers. For
-instance, \texttt{Placement New} keyword allows the programmer to construct an
+instance, \texttt{Placement New} \nb{this keyword does not exist.}keyword allows the programmer to construct an
 object at already allocated memory.  Within a same memory block, we can
 construct multiple objects of different types, which can lead to type confusion
 if these objects are not correctly initialized. Furthermore, we try modify the
 pointers by casting, modifying the object referenced to, or deleting a pointer
 and reusing it to observe if it correctly detects type confusion. These examples
-are particularly known to be backpain points for Hextype due to its nature.
+are particularly known to be backpain \nb{not a word that exist} points for Hextype due to its nature\nb{why? this sentence is way way to vague. either tell me or tell me not}.
 WWhen a pointer is modified or used after being deleted, Hextype should update 
 its type table to reflect the new type of the object but somtimes it fails to do
-so and produces false negatives or false positives.
+so and produces false negatives or false positives. \nb{this could go in implementation}
 
-\subsection{Quirky cases}
+\subsection{Quirky\nb{too informal} cases}
 
-Some features of C++ behave in a specific manner with types or inheritance.
+Some features of C++ behave in a specific manner with types or inheritance. \nb{way too vague, you could put this sentence anywhere}
 Next, we expose some of them which can be tricky to handle for a sanitizer on
 type confusion vulnerabilities:
 
@@ -418,16 +419,16 @@ complex class hierarchies and does not restrict the programmer to a single
 inheritance per object. Furthermore, its application is truly advantageous when
 objects have to share multiple characteristics of several type hierarchies. 
 However, this exposes the code to a higher risk of type confusion, specially
-with the proliferation of these hierarchies.  
+with the proliferation of these hierarchies.   \nb{why higher risk? what is your metric? why is it complicated to handle?}
 
 \textbf{Union}
 
 \noindent{}A union is a special class type that allows to store different types
 of data in the same memory location The feature is particularly useful for
 saving memory as only the last object assigned to it is actually stored, but can
-be difficult to use and understand. When dealing with unions from the point of
+be difficult \nb{add notion of risk, not difficulty}to use and understand. When dealing with unions from the point of
 view of type confusion, we must not confuse type confusion with undefined
-behaviour due to its nature. In fact, it is up to the programmer to ensure that
+behaviour due to its nature\nb{either you explain the nature of it before, or you explain it here. Otherwise people can't follow. What if I do not know the nature of union?}. In fact, it is up to the programmer to ensure that
 the type of the value retrieve from the union is the correct one. Type
 confusions happens when the value retrieved is correct but is wrongly cast to
 another type. For instance in Listing \autoref{lst:union}, the pointer
@@ -437,7 +438,7 @@ should be detected by the sanitizer. However, at line
 \ref{code:union_undefined_behavior}, the pointer \texttt{u.u} references the
 same object as \texttt{u.b}(due to union nature) but is cast to an
 \texttt{Unrelated} object.  Trying to access \texttt{u.u} will lead to undefined
-behavior but is not a type confusion.
+behavior but is not a type confusion.\nb{mention tagged union}
 
 
 \begin{listing}
@@ -468,7 +469,7 @@ int main () {
 \textbf{Phantom Casting}
 
 \noindent{}Phantom casting occurs when a base class and a derived have the same
-data layout.  In this case, it is authorized to cast a pointer from a base class
+data layout.  In this case, it is authorized \nb{it is usually tolerated, but definitely not authorized }to cast a pointer from a base class
 to a derived class even if the object is not of the derived class which should
 be classified as a type confusion.  This special case exists because of backward
 compatibility of C++ with C. Listing \autoref{lst:phantom_casting} shows an
@@ -513,27 +514,27 @@ How are we going to measure the results?
        \item Example of test cases
 \end{itemize}
 
-We want to compare the results obtained from Hextype and type++, individually
+We want to compare the results obtained from Hextype and type++, individually \nb{what does comparing individually mean?}
 and between them. The benchmark quality resides in the diversity and coverage
-offered by most of the tests. In the following we will concentrate on C++11,
+offered by\nb{why most?} most of the tests. In the following we will concentrate on C++11,
 although there are more recent versions with more features dedicated to OOP. In
 addition, we mainly test the standard C++11 without any external libraries or
 frameworks to simplify and evaluate the basis of the language itself. Later on,
 it could be interesting to extends the test suite to more recent versions of C++
-and to external libraries.  In addition, we would describe some challenge we
+and to external libraries\nb{put in another secion.}.  In addition, we would describe some challenge we
 faced during the implementation of the test suite.
 
 \textbf{Set up sanitizers}
 
 \noindent{}Setting up sanitizers was the first step in the implementation of the
 test suite.  The test suite is designed to be run with Hextype and type++ to
-evaluate their efficiency on type confusion vulnerabilities.  It is located
+evaluate their \nb{still not good word} efficiency on type confusion vulnerabilities.  It is located
 inside type++ architecture and did not need to be installed. However, Hextype
 had to be installed and configured to be able to run the test suite. Hextype can
 only run up to C++14 and is not compatible with C++17 or C++20, which is a
 limitation for the test suite. Furthermore, Hextype only triggers type confusion
 inside type hierarchy leaving out a lot of others whereas type++ triggers type
-confusion inside and outside. 
+confusion inside and outside. \nb{use derived, unrelated, your outside inside is confusing}
 
 \textbf{Correctly trigger type confusion}
 
