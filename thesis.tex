@@ -310,27 +310,24 @@ offers a perspective on the effectiveness of each approach, despite the age
 difference between the development of these two mechanisms.
 
 \subsection{Hextype}
-What I want to talk about Hextype?
-\begin{itemize}
-       \item What is Hextype?
-       \item How does it work?
-       \item Its limitations (detect type confusion from cast inside the hierarchy)
-\end{itemize}
 
 HexType is a Clang/LLVM-based type confusion sanitizer used to detect type
 confusion vulnerabilities in C++ programs.  It relies on disjoint metadata to
 keep track of each type of each object and to check types correctness at
-runtime.
+runtime. When compiling a program, Hextype creates a type table which contains
+all the relationship information. Then at runtime, it collects the types 
+of each allocated object inside called object mapping table. Finally, when a cast happens,
+it verifies if the cast is correct by comparing the two previously defined tables and 
+thus detect type confusion. However, Hextype has some limitations, as it considers only 
+type confusion between derived classes and not between unrelated classes.
 
 \subsection{type++}
 
-What I want to talk about type++?
-\begin{itemize}
-       \item What is type++?
-       \item How does it work?
-       \item Its limitations \adrbqt{To be discussed with Nicolas}
-\end{itemize}
-
+Type++ is a recent C++ dialect that extends the C++ language to prevent type
+confusions. It relies on existing metadata, more precisely vtable pointer, to achieve types correctness,
+but instead of keeping only polymorphic objects, it extends this property to all objects.
+At compile, it adds that vtable pointer to each object to keep track of the type of the object
+and then at runtime, it checks if the cast is correct by comparing the vtable pointer of the object.
 
 %%%%%%%%%%%%%%%%
 \chapter{Design}
@@ -411,6 +408,7 @@ if these objects are not correctly initialized. Furthermore, we try to modify th
 pointers by casting, modifying the object referenced to, or deleting a pointer
 and reusing it to observe if it correctly detects type confusion. These examples
 are particularly known to be an issue for Hextype.
+
 \subsection{Special cases}
 
 Along with the initialization and modification of objects, there are some 
@@ -618,6 +616,8 @@ Stats that could be useful for a single sanitizers:
 \end{itemize}
 
 Give intuition on how to improve the current mechanisms
+
+
 
 Later on,
 it could be interesting to extend the test suite to more recent versions of C++
