@@ -36,9 +36,9 @@
 
 \begin{document}
 \maketitle
-\dedication{\textit{Program testing can be used to show the presence of bugs, but never to show their absence!}
+\dedication{\textit{"Before I came here I was confused about this subject. Having listened to your lecture I am still confused. But on a higher level."}
 \begin{flushright}
-"Notes On Structured Programming" by Edsger W. Dijkstra, April 1970.
+- Enrico Fermi
 \end{flushright}
 }
 \makededication
@@ -65,9 +65,11 @@ Goal of the paper i.e., creating a general benchmark for type confusion and expl
 
 C++ has a lot of vulnerabilities due to type confusion, which can lead to memory corruption 
 and security vulnerabilities. Casting a pointer from a type to another is a highly 
-common operation but, if misused, can lead to type confusion and thus can be exploited.
+common operation but, if misused, can lead to type confusion and thus can be exploited. 
+Hextype\cite{hextype} and Type++\cite{typepp} are two mechanisms that aim to detect type confusion at runtime.
+Although they achieve a high success rate, they can not ensure a perfect type safety.\\
+We propose a benchmark that evaluates a range of type confusion cases, on 
 
-Hextype and type++ are two mechanisms that aim to detect type confusion at runtime.
 
 \end{abstract}
 
@@ -100,11 +102,11 @@ C++ is a general purpose
 programming language widely-used in a lot of domains
 such as operating systems, or machine learning. As C++ is a compiled language, it
 allows developers to write extremely fast and efficient code
-that run with minimal overhead. Types are a core concept in C++
+that run with minimal overhead. \\ Types are a core concept in C++
 but typecasting, which is the action of casting from a type to another,
 is source of vulnerabilities. For instance, type confusion is a common
 security issue in C++, which occurs when the compiler misinterprets a pointer
-type generally after a wrong typecasting. This can lead to memory corruption
+type generally after a wrong typecasting.\\ This can lead to memory corruption
 and security vulnerabilities. An adversary can then exploit this vulnerability
 to execute arbitrary code, heap corruption and hijack the control-flow.  Such an
 attack occurred in the past in V8 in Google Chrome, where it allowed a remote
@@ -116,7 +118,8 @@ see line \ref{code:unrelated_type_confusion} in Listing
 \autoref{lst:type_confusion}) or inside a type hierarchy with classes and
 object-oriented programming e.g., casting a pointer from a base class to a
 derived class. This can lead to memory corruption and security
-vulnerabilities. In this chapter, we will present the concept of the object-oriented
+vulnerabilities. \\
+In this chapter, we will present the concept of the object-oriented
 programming, class hierarchies and inheritance in C++ \autoref{sec:cpp_oop}, and
 present the different type casting operators in C++
 \autoref{sec:cpp_type_casting}.  Finally, we will present the different
@@ -292,8 +295,8 @@ existing metadata Runtime Type Information (RTTI), such as vtables.
 Generally, the first approach is more complete because it covers more types, but
 it introduces overhead and performance issues. The second is faster but less
 complete due to its limitation to polymorphic classes, and it caused some crash
-issue.  In this paper, we will focus and compare on two methods: Hextype and
-type++.  Both checks types correctness at runtime, but they differ in their
+issue.  In this paper, we will focus and compare on two methods: Hextype~\cite{hextype} and
+type++\cite{typepp}.  Both checks types correctness at runtime, but they differ in their
 approach. Hextype is older and relies on disjoint metadata to achieve types
 correctness.  Type++ is a recent C++ dialect and relies on existing metadata to
 achieve types correctness but unlike an approach based solely on existing
