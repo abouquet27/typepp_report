@@ -63,6 +63,11 @@ Explain Type confusion, and why they are a problem i.e., memory attacks, safety,
 compare two mechanisms to type confusion.
 Goal of the paper i.e., creating a general benchmark for type confusion and explain the results
 
+C++ has a lot of vulnerabilities due to type confusion, which can lead to memory corruption 
+and security vulnerabilities. Casting a pointer from a type to another is a highly 
+common operation but, if misused, can lead to type confusion and thus can be exploited.
+
+Hextype and type++ are two mechanisms that aim to detect type confusion at runtime.
 
 \end{abstract}
 
@@ -90,17 +95,6 @@ My project:
 %%%%%%%%%%%%%%%%%%%%
 \chapter{Background}
 %%%%%%%%%%%%%%%%%%%%
-
-The background section introduces the necessary background to understand your
-work. This is not necessarily related work but technologies and dependencies
-that must be resolved to understand your design and implementation.
-
-This section is usually 3-5 pages.
-
-My project:
-0. Introduce C++, Type confusion
-1. Explain in more detail and with examples, C++ inheritance and casting
-2. Hextype and type++ paradigm and how they handle type confusion
 
 C++ is a general purpose 
 programming language widely-used in a lot of domains
@@ -504,22 +498,6 @@ int main(){
 \chapter{Implementation}
 %%%%%%%%%%%%%%%%%%%%%%%%
 
-The implementation covers some of the implementation details of your project.
-This is not intended to be a low level description of every line of code that
-you wrote but covers the implementation aspects of the projects.
-
-This section is usually 3-5 pages.
-
-How are we going to implement the test suite according to what was previously defined? What are the challenges? 
-How are we going to measure the results?
-
-\begin{itemize}
-       \item How are we going to implement the test suite according to what was previously defined? 
-       \item What were the challenges?
-       \item How are we going to measure the results?
-       \item Example of test cases
-\end{itemize}
-
 We want to compare the results obtained from Hextype and type++ 
 between them. The benchmark quality resides in the diversity and coverage
 offered by the tests. In the following we will concentrate on C++11,
@@ -617,11 +595,28 @@ Stats that could be useful for a single sanitizers:
 
 Give intuition on how to improve the current mechanisms
 
-
-
 Later on,
 it could be interesting to extend the test suite to more recent versions of C++
 and to external library. 
+
+We first evaluate each mechanism separately and then compare them. Subsequently,
+we will discuss the results and the limitations of the test suite.
+
+\textbf{Type++}
+
+\noindent{}Over the 38 test cases we created, type++ passes 35 and 
+fails 3 of them. 2 of the failed due to multiple inheritance. The main issue 
+is that type++ does not handle multiple inheritance. The test \texttt{multiple_parent.cpp},
+a simple test case with a class that inherits from two classes. When we create an object
+of the second base class and cast it to the derived class, it should be detected as a type confusion.
+However type++ does not detect it and classifies it as "missed". 
+The second test case that failed is \texttt{union_casting.cpp}, where we try to cast a pointer on a union
+to a pointer of a value inside the union. This test case is not detected as a type confusion by type++.
+
+\textbf{Hextype}
+
+\noindent{}Over the 38 test cases we created, Hextype passes 31 and fails 7 of them.
+
 
 %%%%%%%%%%%%%%%%%%%%%%
 \chapter{Related Work}
